@@ -1,0 +1,22 @@
+.alert-failure {
+  color: white;
+  background-color: #d17171;
+  border-color: #d17171;
+}
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+#centerpiece {
+  margin: auto;
+  width: 50%;
+}
+
+/* #spaceholder {
+    margin-top: 200px;
+    margin-left: 100px;
+} */
