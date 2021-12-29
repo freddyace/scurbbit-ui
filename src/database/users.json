@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "firstname": "freddy",
+      "lastname": "acevedo",
+      "email": "freddyace1993@gmail.com",
+      "userTypes": [1, 2]
+    },
+    {
+      "firstname": "laura",
+      "lastname": "meza",
+      "email": "lbernalmeza@gmail.com",
+      "userTypes": [1]
+    },
+    {
+      "firstname": "Chris",
+      "lastname": "Reynolds",
+      "email": "reynoldswrap@gmail.com",
+      "userTypes": [1]
+    },
+    {
+      "firstname": "Tracy",
+      "lastname": "Green",
+      "email": "tgreen@gmail.com",
+      "userTypes": [1, 2]
+    }
+  ]
+}
