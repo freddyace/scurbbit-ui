@@ -22,8 +22,24 @@ import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
 import speck from "../src/container/Landing/speck1.png";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
 function App() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
+    authDomain: "scrubbit-dev-336218.firebaseapp.com",
+    projectId: "scrubbit-dev-336218",
+    storageBucket: "scrubbit-dev-336218.appspot.com",
+    messagingSenderId: "62654367990",
+    appId: "1:62654367990:web:95bb2cc806590e0c6804d7",
+    measurementId: "G-JN132NMEGS",
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
   const showLoader = () => {
     return (
       <Loader
@@ -84,24 +100,40 @@ function App() {
         setIsLoading(true);
       }
     }, [isLoading]);
-    useEffect(() => {
-      // GET request using fetch inside useEffect React hook
-      fetch(
-        "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-      ).then((response) => {
-        console.log(response);
-      });
-    }, []);
+    // useEffect(() => {
+    //   // GET request using fetch inside useEffect React hook
+    //   fetch(
+    //     "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    //   ).then((response) => {
+    //     console.log(response);
+    //   });
+    // }, []);
     const [usernameStyle, setUsernameStyle] = useState({});
     const [passwordStyle, setPasswordStyle] = useState({});
 
     const handleSubmit = () => {
       console.log("calling handleSubmit");
+      console.log("username is: ", usernameInput);
+      console.log("password is: ", passwordInput);
       setIsLoading(true);
       auth.signin(() => {
         console.log("inside callback");
         history.replace(from);
         history.push("/dashboard");
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, usernameInput, passwordInput)
+          .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            console.log("Successful Authentication for user: ", user);
+            // ...
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log("error");
+          });
+
         setIsLoading(false);
       });
     };

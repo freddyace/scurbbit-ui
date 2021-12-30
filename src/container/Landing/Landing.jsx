@@ -9,10 +9,25 @@ import FacebookLogin from "react-facebook-login";
 import { Redirect, useHistory } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const Landing = () => {
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    });
+
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
     authDomain: "scrubbit-dev-336218.firebaseapp.com",
@@ -61,6 +76,7 @@ const Landing = () => {
   const [passwordStyle, setPasswordStyle] = useState({});
 
   const handleSubmit = (event) => {
+    console.log("testing");
     console.log(event.target.username.value);
   };
 
@@ -92,7 +108,7 @@ const Landing = () => {
       <div className="row flex center v-center full-height">
         <div className="col-8 col-sm-4">
           <div className="form-box">
-            <form onSubmit={handleSubmit}>
+            <form>
               <fieldset>
                 <legend>Sign in</legend>
                 <img
@@ -127,7 +143,11 @@ const Landing = () => {
                 />
                 <Link to="/createAccount"> Create Account</Link>
                 <div id="fb-root"></div>
-                <button className="btn btn-primary btn-block" type="submit">
+                <button
+                  className="btn btn-primary btn-block"
+                  type="button"
+                  onClick={handleSubmit}
+                >
                   Login
                 </button>
                 <br></br>
