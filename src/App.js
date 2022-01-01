@@ -105,19 +105,21 @@ function App() {
         setIsLoading(true);
       }
     }, [isLoading]);
-    useEffect(() => {
-      // GET request using fetch inside useEffect React hook
-      fetch(
-        "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-      ).then((response) => {
-        console.log(response);
-      });
-    }, []);
+    // useEffect(() => {
+    //   // GET request using fetch inside useEffect React hook
+    //   fetch(
+    //     "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    //   ).then((response) => {
+    //     console.log(response);
+    //   });
+    // }, []);
     const [usernameStyle, setUsernameStyle] = useState({});
     const [passwordStyle, setPasswordStyle] = useState({});
 
     const handleSubmit = () => {
       console.log("calling handleSubmit");
+      console.log("username is: ", usernameInput);
+      console.log("password is: ", passwordInput);
       setIsLoading(true);
       const firebaseAuth = getAuth();
       signInWithEmailAndPassword(firebaseAuth, usernameInput, passwordInput)
@@ -134,6 +136,20 @@ function App() {
         console.log("inside callback");
         history.replace(from);
         history.push("/dashboard");
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, usernameInput, passwordInput)
+          .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            console.log("Successful Authentication for user: ", user);
+            // ...
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log("error");
+          });
+
         setIsLoading(false);
       });
     };
@@ -165,7 +181,7 @@ function App() {
       showLoader()
     ) : (
       <div className="container full-height">
-        <div className="row flex center v-center full-height">
+        {/* <div className="row flex center v-center full-height">
           <div className="col-8 col-sm-4">
             <div className="form-box">
               <form>
@@ -219,8 +235,8 @@ function App() {
               </form>
             </div>
           </div>
-        </div>
-        <div className="container">
+        </div> */}
+        {/* <div className="container">
           <div>
             {!loggedin && (
               <FacebookLogin
@@ -246,10 +262,10 @@ function App() {
               </div>
             )}
           </div>
-        </div>
-        <div>
+        </div> */}
+        {/* <div>
           <button onClick={signout}>sign out</button>
-        </div>
+        </div> */}
         <section class="login-clean">
           <form>
             <h1 style={{ color: "gray", textAlign: "center" }}>Scrubbit</h1>
@@ -392,7 +408,7 @@ function App() {
     <ProvideAuth>
       <Router>
         <div>
-          <AuthButton />
+          {/* <AuthButton /> */}
 
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
