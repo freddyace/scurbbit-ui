@@ -6,6 +6,9 @@ import React, {
   useRef,
 } from "react";
 import "./App.css";
+import "./Login-Form-Clean.css";
+import "./bootstrap.min.css";
+import "../src/fonts/ionicons.min.css";
 import CreateAccount from "./container/Landing/CreateAccount/CreateAccount";
 import {
   BrowserRouter as Router,
@@ -22,8 +25,26 @@ import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
 import speck from "../src/container/Landing/speck1.png";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
 
 function App() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
+    authDomain: "scrubbit-dev-336218.firebaseapp.com",
+    databaseURL: "https://scrubbit-dev-336218-default-rtdb.firebaseio.com",
+    projectId: "scrubbit-dev-336218",
+    storageBucket: "scrubbit-dev-336218.appspot.com",
+    messagingSenderId: "62654367990",
+    appId: "1:62654367990:web:53198f68ebb3fedb6804d7",
+    measurementId: "G-0QL4B38S3S",
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
   const showLoader = () => {
     return (
       <Loader
@@ -98,6 +119,17 @@ function App() {
     const handleSubmit = () => {
       console.log("calling handleSubmit");
       setIsLoading(true);
+      const firebaseAuth = getAuth();
+      signInWithEmailAndPassword(firebaseAuth, usernameInput, passwordInput)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
       auth.signin(() => {
         console.log("inside callback");
         history.replace(from);
@@ -218,6 +250,53 @@ function App() {
         <div>
           <button onClick={signout}>sign out</button>
         </div>
+        <section class="login-clean">
+          <form>
+            <h1 style={{ color: "gray", textAlign: "center" }}>Scrubbit</h1>
+            <div class="illustration">
+              <i class="icon ion-waterdrop"></i>
+            </div>
+            <div class="mb-3">
+              <input
+                class="form-control"
+                type="email"
+                name="email"
+                placeholder="Email"
+                onChange={(e) => {
+                  validateUsername(e.target.value);
+                  setUsernameInput(e.target.value);
+                  console.log("usernameInput var is: ", usernameInput);
+                }}
+              />
+            </div>
+            <div class="mb-3">
+              <input
+                class="form-control"
+                type="password"
+                name="password"
+                placeholder="Password"
+                onChange={(e) => {
+                  validatePassword(e.target.value);
+                  setPasswordInput(e.target.value);
+                  console.log("passwordInput is: ", passwordInput);
+                }}
+              />
+            </div>
+            <div class="mb-3">
+              <button
+                class="btn btn-primary d-block w-100"
+                type="button"
+                onClick={handleSubmit}
+              >
+                Log In
+              </button>
+            </div>
+            <a class="forgot" href="#">
+              Forgot your email or password?
+            </a>
+          </form>
+        </section>
+        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
       </div>
     );
   };
