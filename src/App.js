@@ -29,7 +29,6 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
@@ -118,40 +117,25 @@ function App() {
 
     const handleSubmit = () => {
       console.log("calling handleSubmit");
-      console.log("username is: ", usernameInput);
-      console.log("password is: ", passwordInput);
       setIsLoading(true);
       const firebaseAuth = getAuth();
       signInWithEmailAndPassword(firebaseAuth, usernameInput, passwordInput)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      });
-      auth.signin(() => {
-        console.log("inside callback");
-        history.replace(from);
-        history.push("/dashboard");
-        const auth = getAuth();
-        signInWithEmailAndPassword(auth, usernameInput, passwordInput)
-          .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            console.log("Successful Authentication for user: ", user);
-            // ...
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log("error");
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          // ...
+          auth.signin(() => {
+            console.log("inside callback");
+            history.replace(from);
+            history.push("/dashboard");
+            const auth = getAuth();
+            setIsLoading(false);
           });
-
-        setIsLoading(false);
-      });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
     };
 
     const validatePassword = (input) => {
@@ -361,25 +345,25 @@ function App() {
     },
   };
 
-  function AuthButton() {
-    let history = useHistory();
-    let auth = useAuth();
+  // function AuthButton() {
+  //   let history = useHistory();
+  //   let auth = useAuth();
 
-    return auth.user ? (
-      <p>
-        Welcome!{" "}
-        <button
-          onClick={() => {
-            auth.signout(() => history.push("/"));
-          }}
-        >
-          Sign out
-        </button>
-      </p>
-    ) : (
-      <p>You are not logged in.</p>
-    );
-  }
+  //   return auth.user ? (
+  //     <p>
+  //       Welcome!{" "}
+  //       <button
+  //         onClick={() => {
+  //           auth.signout(() => history.push("/"));
+  //         }}
+  //       >
+  //         Sign out
+  //       </button>
+  //     </p>
+  //   ) : (
+  //     <p>You are not logged in.</p>
+  //   );
+  // }
 
   function PrivateRoute({ children, ...rest }) {
     console.log("inside private route");
