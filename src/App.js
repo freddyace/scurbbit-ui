@@ -104,6 +104,9 @@ function App() {
         setIsLoading(true);
       }
     }, [isLoading]);
+    useEffect(() => {
+
+    }, )
     // useEffect(() => {
     //   // GET request using fetch inside useEffect React hook
     //   fetch(
@@ -124,13 +127,14 @@ function App() {
           // Signed in
           const user = userCredential.user;
           // ...
-          auth.signin(() => {
+          console.log("calling auth.signin");
+          auth.signin((user) => {
             console.log("inside callback");
             history.replace(from);
             history.push("/dashboard");
-            const auth = getAuth();
             setIsLoading(false);
-          });
+            localStorage.setItem("user", JSON.stringify(user));
+          }, user);
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -311,13 +315,12 @@ function App() {
   }
   function useProvideAuth() {
     const [user, setUser] = useState(null);
-
-    const signin = (cb) => {
-      return fakeAuth.signin(() => {
+    const signin = (cb, userArg) => {
+      return fakeAuth.signin((user) => {
         console.log("in fakeAuth.signin");
-        setUser("user");
-        cb();
-      });
+        setUser(userArg);
+        cb(userArg);
+      }, userArg);
     };
 
     const signout = (cb) => {
@@ -335,9 +338,14 @@ function App() {
   }
   const fakeAuth = {
     isAuthenticated: false,
-    signin(cb) {
-      fakeAuth.isAuthenticated = true;
-      setTimeout(cb, 1000); // fake async
+    signin(cb, user) {
+      if (user) {
+        fakeAuth.isAuthenticated = true;
+        setTimeout(cb, 1000); // fake async
+      } else {
+        fakeAuth.isAuthenticated = false;
+        setTimeout(cb, 1000); // fake async
+      }
     },
     signout(cb) {
       fakeAuth.isAuthenticated = false;
@@ -369,6 +377,7 @@ function App() {
     console.log("inside private route");
 
     let auth = useAuth();
+    console.log("calling auth.user, result is: ", auth.user);
     return (
       <Route
         {...rest}
