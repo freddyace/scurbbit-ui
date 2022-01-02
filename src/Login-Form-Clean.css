@@ -65,3 +65,13 @@
   opacity: 1;
   text-decoration: none;
 }
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(120deg, #00e4d0, #5983e8);
+  color: white;
+  text-align: center;
+}

@@ -40,7 +40,6 @@ function App() {
     appId: "1:62654367990:web:53198f68ebb3fedb6804d7",
     measurementId: "G-0QL4B38S3S",
   };
-
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
@@ -66,19 +65,28 @@ function App() {
     let history = useHistory();
     const [usernameInput, setUsernameInput] = useState();
     const [passwordInput, setPasswordInput] = useState();
-
+    const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("user"));
     const [isLoading, setIsLoading] = useState(false);
 
     const showLoader = () => {
       console.log("inside showLoader");
       return (
-        <Loader
-          type="Puff"
-          color="#00BFFF"
-          height={100}
-          width={100}
-          timeout={30000} //3 secs
-        />
+        <div
+          style={{
+            textAlign: "center",
+            margin: "auto",
+            width: "50%",
+            padding: "10px",
+          }}
+        >
+          <Loader
+            type="Puff"
+            color="#00BFFF"
+            height={100}
+            width={100}
+            timeout={30000} //3 secs
+          />
+        </div>
       );
     };
 
@@ -104,9 +112,7 @@ function App() {
         setIsLoading(true);
       }
     }, [isLoading]);
-    useEffect(() => {
-
-    }, )
+    useEffect(() => {});
     // useEffect(() => {
     //   // GET request using fetch inside useEffect React hook
     //   fetch(
@@ -139,6 +145,10 @@ function App() {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          setTimeout(() => {
+            console.log("An error occured during authentication....");
+            setIsLoading(false);
+          }, 3000);
         });
     };
 
@@ -165,95 +175,24 @@ function App() {
       }
     };
 
+    const goToDashboard = () => {
+      console.log("calling go to dashboard");
+      // history.push("/dashboard");
+      return (
+        <Redirect
+          to={{
+            pathname: "/dashboard",
+            state: { from: location },
+          }}
+        />
+      );
+    };
     return isLoading ? (
       showLoader()
+    ) : isLoggedIn ? (
+      goToDashboard()
     ) : (
       <div className="container full-height">
-        {/* <div className="row flex center v-center full-height">
-          <div className="col-8 col-sm-4">
-            <div className="form-box">
-              <form>
-                <fieldset>
-                  <legend>Sign in</legend>
-                  <img
-                    id="avatar"
-                    className="avatar round"
-                    src={speck}
-                    alt="Scrubz"
-                  />
-                  <hr></hr>
-                  <input
-                    className="form-control"
-                    type="email"
-                    id="username"
-                    name="email"
-                    placeholder="email"
-                    onChange={(e) => {
-                      validateUsername(e.target.value);
-                      setUsernameInput(e.target.value);
-                      console.log("usernameInput var is: ", usernameInput);
-                    }}
-                    style={usernameStyle}
-                  />
-                  <br></br>
-                  <input
-                    className="form-control"
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="password"
-                    onChange={(e) => {
-                      validatePassword(e.target.value);
-                      setPasswordInput(e.target.value);
-                      console.log("passwordInput is: ", passwordInput);
-                    }}
-                    style={passwordStyle}
-                  />
-                  <Link to="/createAccount"> Create Account</Link>
-                  <div id="fb-root"></div>
-                  <button
-                    className="btn btn-primary btn-block"
-                    type="button"
-                    onClick={handleSubmit}
-                  >
-                    Login
-                  </button>
-                  <br></br>
-                </fieldset>
-              </form>
-            </div>
-          </div>
-        </div> */}
-        {/* <div className="container">
-          <div>
-            {!loggedin && (
-              <FacebookLogin
-                appId="312484227447285"
-                // autoLoad={true}
-                fields="name,email,picture"
-                scope="public_profile"
-                callback={responseFacebook}
-                icon="fa-facebook"
-              />
-            )}
-            {loggedin && (
-              <div>
-                <img src={picture} roundedCircle />
-              </div>
-            )}
-          </div>
-          <div>
-            {loggedin && (
-              <div>
-                <div>{data.name}</div>
-                <div>{data.email}</div>
-              </div>
-            )}
-          </div>
-        </div> */}
-        {/* <div>
-          <button onClick={signout}>sign out</button>
-        </div> */}
         <section class="login-clean">
           <form>
             <h1 style={{ color: "gray", textAlign: "center" }}>Scrubbit</h1>
@@ -298,9 +237,15 @@ function App() {
             <a class="forgot" href="#">
               Forgot your email or password?
             </a>
+            <a class="forgot" href="#">
+              Create Account
+            </a>
           </form>
         </section>
         <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+        {/* <div class="footer">
+          <p>Footer</p>
+        </div> */}
       </div>
     );
   };
@@ -382,7 +327,7 @@ function App() {
       <Route
         {...rest}
         render={({ location }) =>
-          auth.user ? (
+          auth.user || localStorage.getItem("user") ? (
             children
           ) : (
             <Redirect
