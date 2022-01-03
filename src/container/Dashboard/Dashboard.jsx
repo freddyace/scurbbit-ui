@@ -37,7 +37,7 @@ const Dashboard = () => {
             }}
             src={profilePic}
           />
-          <h1 style={{ color: "white", margin:"auto" }}>Scrubbit</h1>
+          <h1 style={{ color: "white", margin: "auto" }}>Scrubbit</h1>
           <button
             data-bs-toggle="collapse"
             className="navbar-toggler"
@@ -79,7 +79,13 @@ const Dashboard = () => {
                 </a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#" style={{ color: "white" }}>
+                <a
+                  className="nav-link"
+                  onClick={() => {
+                    history.push("/editProfile");
+                  }}
+                  style={{ color: "white" }}
+                >
                   Edit Profile
                 </a>
               </li>

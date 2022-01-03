@@ -19,6 +19,7 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import FacebookLogin from "react-facebook-login";
 // import { Card, Image } from 'react-bootstrap';
 import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
@@ -28,7 +29,7 @@ import Loader from "react-loader-spinner";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
+import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
@@ -42,6 +43,11 @@ function App() {
   };
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  const picRef = ref(storage, "/test/img.png");
+  // uploadBytes(picRef, file).then((snapshot) => {
+  //   console.log("uploaded a blob or file..");
+  // });
   const analytics = getAnalytics(app);
   const showLoader = () => {
     return (
@@ -67,7 +73,8 @@ function App() {
     const [passwordInput, setPasswordInput] = useState();
     const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("user"));
     const [isLoading, setIsLoading] = useState(false);
-
+    const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+    const [isResettingPassword, setIsResettingPassword] = useState(false);
     const showLoader = () => {
       console.log("inside showLoader");
       return (
@@ -212,34 +219,117 @@ function App() {
                 }}
               />
             </div>
-            <div class="mb-3">
-              <input
-                class="form-control"
-                type="password"
-                name="password"
-                placeholder="Password"
-                onChange={(e) => {
-                  validatePassword(e.target.value);
-                  setPasswordInput(e.target.value);
-                  console.log("passwordInput is: ", passwordInput);
+            {!isResettingPassword ? (
+              <div class="mb-3">
+                <input
+                  class="form-control"
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  onChange={(e) => {
+                    validatePassword(e.target.value);
+                    setPasswordInput(e.target.value);
+                    console.log("passwordInput is: ", passwordInput);
+                  }}
+                />
+              </div>
+            ) : (
+              <div />
+            )}
+            {isCreatingAccount ? (
+              <div>
+                <div class="mb-3">
+                  <input
+                    class="form-control"
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    onChange={(e) => {
+                      validatePassword(e.target.value);
+                      setPasswordInput(e.target.value);
+                      console.log("passwordInput is: ", passwordInput);
+                    }}
+                  />
+                </div>
+                <div class="mb-3">
+                  <input
+                    class="form-control"
+                    type="text"
+                    name="desiredUsername"
+                    placeholder="Public Username"
+                    onChange={(e) => {
+                      validatePassword(e.target.value);
+                      setPasswordInput(e.target.value);
+                      console.log("passwordInput is: ", passwordInput);
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div />
+            )}
+            {!isResettingPassword && !isCreatingAccount ? (
+              <a
+                class="forgot"
+                onClick={() => {
+                  setIsResettingPassword(true);
                 }}
-              />
-            </div>
-            <div class="mb-3">
+              >
+                Forgot your email or password?
+              </a>
+            ) : (
+              <div />
+            )}
+            {!isCreatingAccount && !isResettingPassword ? (
+              <div class="mb-3">
+                <button
+                  class="btn btn-primary d-block w-100"
+                  type="button"
+                  onClick={handleSubmit}
+                >
+                  Log In
+                </button>
+              </div>
+            ) : (
+              <div />
+            )}
+            {isResettingPassword ? (
+              <div class="mb-3">
+                <button
+                  class="btn btn-primary d-block w-100"
+                  type="button"
+                  onClick={handleSubmit}
+                >
+                  Send email
+                </button>
+              </div>
+            ) : (
+              <div />
+            )}
+            {!isResettingPassword ? (
               <button
                 class="btn btn-primary d-block w-100"
                 type="button"
-                onClick={handleSubmit}
+                onClick={() => {
+                  setIsCreatingAccount(true);
+                }}
               >
-                Log In
+                Create Account
               </button>
-            </div>
-            <a class="forgot" href="#">
-              Forgot your email or password?
-            </a>
-            <a class="forgot" href="#">
-              Create Account
-            </a>
+            ) : (
+              <div />
+            )}
+            {
+              <a
+                class="forgot"
+                onClick={() => {
+                  setIsCreatingAccount(false);
+                  setIsResettingPassword(false);
+                }}
+              >
+                Cancel
+              </a>
+            }
           </form>
         </section>
         <script src="assets/bootstrap/js/bootstrap.min.js"></script>
@@ -354,6 +444,9 @@ function App() {
             <Route path="/createAccount">
               <CreateAccount />
             </Route>
+            <PrivateRoute path="/editProfile">
+              <EditProfile />
+            </PrivateRoute>
             <PrivateRoute path="/dashboard">
               <Dashboard />
             </PrivateRoute>
