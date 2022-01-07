@@ -7,6 +7,7 @@ import profilePic from "./img/img.png";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import Spinner from "../../component/loader/Spinner.jsx";
+import AppNavBar from "../../component/AppNavBar/AppNavBar.jsx";
 const Dashboard = () => {
   const [showNavBar, setShowNavBar] = useState(false);
   const [navBarStyles, setNavBarStyles] = useState("collapse navbar-collapse");
@@ -17,7 +18,7 @@ const Dashboard = () => {
     <Spinner />
   ) : (
     <div>
-      <nav
+      {/* <nav
         className="navbar navbar-light navbar-expand-md"
         style={{ background: "linear-gradient(120deg, #00e4d0, #5983e8)" }}
       >
@@ -109,7 +110,7 @@ const Dashboard = () => {
             </ul>
           </div>
         </div>
-      </nav>
+      </nav> */}
       <section className="pricing py-5" style={{ background: "white" }}>
         <div className="container">
           <div className="row">

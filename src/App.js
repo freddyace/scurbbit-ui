@@ -30,6 +30,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
+import AppNavBar from "./component/AppNavBar/AppNavBar";
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
@@ -445,9 +446,11 @@ function App() {
               <CreateAccount />
             </Route>
             <PrivateRoute path="/editProfile">
+              <AppNavBar />
               <EditProfile />
             </PrivateRoute>
             <PrivateRoute path="/dashboard">
+              <AppNavBar />
               <Dashboard />
             </PrivateRoute>
             <Route path="/">
