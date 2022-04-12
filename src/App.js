@@ -30,7 +30,11 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
+import SelectScrubber from "./container/OnDemand/SelectScrubber.jsx";
 import AppNavBar from "./component/AppNavBar/AppNavBar";
+import About from "./container/About";
+import Contact from "./container/Contact/Contact";
+
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
@@ -389,26 +393,6 @@ function App() {
     },
   };
 
-  // function AuthButton() {
-  //   let history = useHistory();
-  //   let auth = useAuth();
-
-  //   return auth.user ? (
-  //     <p>
-  //       Welcome!{" "}
-  //       <button
-  //         onClick={() => {
-  //           auth.signout(() => history.push("/"));
-  //         }}
-  //       >
-  //         Sign out
-  //       </button>
-  //     </p>
-  //   ) : (
-  //     <p>You are not logged in.</p>
-  //   );
-  // }
-
   function PrivateRoute({ children, ...rest }) {
     console.log("inside private route");
 
@@ -442,6 +426,13 @@ function App() {
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
+            <PrivateRoute path="/getService">
+              <SelectScrubber />
+            </PrivateRoute>
+            <Route path="/about">
+              <AppNavBar />
+              <About />
+            </Route>
             <Route path="/createAccount">
               <CreateAccount />
             </Route>
@@ -452,6 +443,10 @@ function App() {
             <PrivateRoute path="/dashboard">
               <AppNavBar />
               <Dashboard />
+            </PrivateRoute>
+            <PrivateRoute path="/contact">
+              <AppNavBar />
+              <Contact />
             </PrivateRoute>
             <Route path="/">
               <Landing />

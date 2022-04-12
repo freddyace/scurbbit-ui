@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import profilePic from "../../container/Dashboard/img/img.png"
-
+import profilePic from "../../container/Dashboard/img/img.png";
+import { Redirect } from "react-router-dom";
 const AppNavBar = () => {
   const [navBarStyles, setNavBarStyles] = useState("collapse navbar-collapse");
   const [showNavBar, setShowNavBar] = useState(false);
@@ -53,20 +53,33 @@ const AppNavBar = () => {
             <li className="nav-item">
               <a
                 className="nav-link"
-                id="home"
+                onClick={() => {
+                  history.push("/");
+                }}
                 style={{ color: "white" }}
-                href="#"
               >
                 Home{" "}
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#" style={{ color: "white" }}>
+              <a
+                className="nav-link"
+                onClick={() => {
+                  history.push("/about");
+                }}
+                style={{ color: "white" }}
+              >
                 About{" "}
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#" style={{ color: "white" }}>
+              <a
+                className="nav-link"
+                onClick={() => {
+                  history.push("/contact");
+                }}
+                style={{ color: "white" }}
+              >
                 Contact{" "}
               </a>
             </li>

@@ -143,6 +143,9 @@ const Dashboard = () => {
                       background: "linear-gradient(120deg, #00e4d0, #5983e8)",
                       border: "white",
                     }}
+                    onClick={() => {
+                      history.push('/getService')
+                    }}
                   >
                     Order service now
                   </a>
