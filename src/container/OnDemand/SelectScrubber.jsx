@@ -6,9 +6,9 @@ import "../Dashboard/fonts/font-awesome.min.css";
 import "../Dashboard/css/Navigation-Menu.css";
 import "../Dashboard/css/Pricing-Table---EspacioBinariocom.css";
 import "../Dashboard/css/styles.css";
-import "./styles.css"
+import "./styles.css";
 
-import img1 from "../About/assets/img/clean1.jpg"
+import img1 from "../About/assets/img/clean1.jpg";
 const SelectScrubber = () => {
   let history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,15 +32,12 @@ const SelectScrubber = () => {
                   <hr />
                   <ul className="fa-ul">
                     <li>
-                        <img className= "card-image" src={img1}/>
+                      <img className="card-image" src={img1} />
                     </li>
                     <li>
                       <b>4.2/5</b>
                       <span className="fa-li">
-                        <i
-                          className="fa fa-star"
-                          style={{ color: "gold" }}
-                        ></i>
+                        <i className="fa fa-star" style={{ color: "gold" }}></i>
                       </span>
                     </li>
                   </ul>
@@ -62,7 +59,20 @@ const SelectScrubber = () => {
               </div>
             </div>
           </div>
-          <button onClick={()=>{history.push('/')}}>Cancel</button>
+          <a
+            className="btn btn-success d-block w-100"
+            role="button"
+            style={{
+              color: "rgb(255,255,255)",
+              background: "linear-gradient(120deg, #00e4d0, #5983e8)",
+              border: "white",
+            }}
+            onClick={() => {
+              history.push("/");
+            }}
+          >
+            Cancel
+          </a>{" "}
         </div>
       </section>
     </div>
