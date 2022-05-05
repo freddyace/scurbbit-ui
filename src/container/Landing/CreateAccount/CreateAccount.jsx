@@ -32,7 +32,7 @@ const CreateAccount = () => {
           <div class="row flex center v-center full-height">
             <div class="col-8 col-sm-4">
               <div class="form-box">
-                <form onSubmit={handleSubmit}>
+                <form onChange={handleSubmit}>
                   <fieldset>
                     <legend>Sign in</legend>
                     <img id="avatar" class="avatar round" src={speck} />

@@ -23,12 +23,15 @@ import { getStorage, ref, uploadBytes } from "firebase/storage";
 import FacebookLogin from "react-facebook-login";
 // import { Card, Image } from 'react-bootstrap';
 import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
-import speck from "../src/container/Landing/speck1.png";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
 import SelectScrubber from "./container/OnDemand/SelectScrubber.jsx";
 import AppNavBar from "./component/AppNavBar/AppNavBar";
@@ -76,6 +79,8 @@ function App() {
     let history = useHistory();
     const [usernameInput, setUsernameInput] = useState();
     const [passwordInput, setPasswordInput] = useState();
+    const [confirmPasswordInput, setConfirmPasswordInput] = useState();
+    const [emailInput, setEmailInput] = useState();
     const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("user"));
     const [isLoading, setIsLoading] = useState(false);
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
@@ -125,43 +130,98 @@ function App() {
       }
     }, [isLoading]);
     useEffect(() => {});
-    // useEffect(() => {
-    //   // GET request using fetch inside useEffect React hook
-    //   fetch(
-    //     "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    //   ).then((response) => {
-    //     console.log(response);
-    //   });
-    // }, []);
+
     const [usernameStyle, setUsernameStyle] = useState({});
     const [passwordStyle, setPasswordStyle] = useState({});
 
+    const createAccount = () => {
+      let newAccountData = {
+        email: emailInput,
+        password: passwordInput,
+        confirmPassword: confirmPasswordInput,
+        username: usernameInput,
+      };
+      console.log("Account data: ", newAccountData);
+      if (isCreatingAccount) {
+        createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput)
+          .then((userCredential) => {
+            // Signed in
+            console.log("userCredential is: ", userCredential);
+            //const user = userCredential.user;
+            // ...
+            console.log("calling auth.signin");
+            // auth.signin((user) => {
+            //   console.log("inside callback");
+            //   history.replace(from);
+            //   history.push("/dashboard");
+            //   setIsLoading(false);
+            //   localStorage.setItem("user", JSON.stringify(user));
+            // }, user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
+      }
+      // handleSubmit();
+      console.log("Account created!");
+    };
     const handleSubmit = () => {
       console.log("calling handleSubmit");
       setIsLoading(true);
       const firebaseAuth = getAuth();
-      signInWithEmailAndPassword(firebaseAuth, usernameInput, passwordInput)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          // ...
-          console.log("calling auth.signin");
-          auth.signin((user) => {
-            console.log("inside callback");
-            history.replace(from);
-            history.push("/dashboard");
-            setIsLoading(false);
-            localStorage.setItem("user", JSON.stringify(user));
-          }, user);
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setTimeout(() => {
-            console.log("An error occured during authentication....");
-            setIsLoading(false);
-          }, 3000);
-        });
+      if (isCreatingAccount) {
+        console.log("account created!");
+        createUserWithEmailAndPassword(auth, emailInput, passwordInput)
+          .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            // ...
+            console.log("calling auth.signin");
+            // auth.signin((user) => {
+            //   console.log("inside callback");
+            //   history.replace(from);
+            //   history.push("/dashboard");
+            //   setIsLoading(false);
+            //   localStorage.setItem("user", JSON.stringify(user));
+            // }, user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
+      } else {
+        signInWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
+          .then((userCredential) => {
+            // Signed in
+            console.log(
+              "signing in with emai: ",
+              emailInput,
+              ", password: ",
+              passwordInput
+            );
+            const user = userCredential.user;
+            // ...
+            console.log("calling auth.signin");
+            auth.signin((user) => {
+              console.log("inside callback");
+              history.replace(from);
+              history.push("/dashboard");
+              setIsLoading(false);
+              localStorage.setItem("user", JSON.stringify(user));
+            }, user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            setTimeout(() => {
+              console.log("An error occured during authentication....");
+              setIsLoading(false);
+            }, 3000);
+          });
+      }
     };
 
     const validatePassword = (input) => {
@@ -218,9 +278,9 @@ function App() {
                 name="email"
                 placeholder="Email"
                 onChange={(e) => {
-                  validateUsername(e.target.value);
-                  setUsernameInput(e.target.value);
-                  console.log("usernameInput var is: ", usernameInput);
+                  // validateUsername(e.target.value);
+                  setEmailInput(e.target.value);
+                  console.log("emailInput var is: ", emailInput);
                 }}
               />
             </div>
@@ -251,21 +311,11 @@ function App() {
                     placeholder="Confirm Password"
                     onChange={(e) => {
                       validatePassword(e.target.value);
-                      setPasswordInput(e.target.value);
-                      console.log("passwordInput is: ", passwordInput);
-                    }}
-                  />
-                </div>
-                <div class="mb-3">
-                  <input
-                    class="form-control"
-                    type="text"
-                    name="desiredUsername"
-                    placeholder="Public Username"
-                    onChange={(e) => {
-                      validatePassword(e.target.value);
-                      setPasswordInput(e.target.value);
-                      console.log("passwordInput is: ", passwordInput);
+                      setConfirmPasswordInput(e.target.value);
+                      console.log(
+                        "confirmPasswordInput is: ",
+                        confirmPasswordInput
+                      );
                     }}
                   />
                 </div>
@@ -311,12 +361,13 @@ function App() {
             ) : (
               <div />
             )}
-            {!isResettingPassword ? (
+            {!isResettingPassword || !isCreatingAccount ? (
               <button
                 class="btn btn-primary d-block w-100"
                 type="button"
                 onClick={() => {
                   setIsCreatingAccount(true);
+                  createAccount();
                 }}
               >
                 Create Account

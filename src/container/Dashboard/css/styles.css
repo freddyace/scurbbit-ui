@@ -1,11 +1,3 @@
-html {
-    padding: 2rem;
-  }
-  
-  h1, p {
-    font-family: Lato;
-  }
-  
-  :root {
-    --pulsating-dot: #00BEFF; 
+    :root {
+    --pulsating-dot: #7CFC00; 
   }

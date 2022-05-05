@@ -59,6 +59,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        <br></br>
         <div className="container">
           <div className="row">
             <div className="col col-lg-4">

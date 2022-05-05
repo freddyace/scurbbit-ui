@@ -31,6 +31,7 @@ const Landing = () => {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
     authDomain: "scrubbit-dev-336218.firebaseapp.com",
+    databaseURL: "https://scrubbit-dev-336218-default-rtdb.firebaseio.com/",
     projectId: "scrubbit-dev-336218",
     storageBucket: "scrubbit-dev-336218.appspot.com",
     messagingSenderId: "62654367990",

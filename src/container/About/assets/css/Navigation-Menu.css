@@ -34,14 +34,14 @@
 }
 
 .navbar-default .navbar-nav > li > a:hover {
-  background: #f64c3b;
+  /* background: #f64c3b; */
   color: #fff;
   text-decoration: none;
 }
 
 .navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
   color: #f4e7e7;
-  background: #f64c3b;
+  /* background: #f64c3b; */
   text-decoration: none;
   font-size: 13px;
   font-weight: 400;
@@ -52,6 +52,6 @@
 }
 
 a:active {
-  background: red;
+  /* background: red; */
 }
 
