@@ -26,17 +26,20 @@ import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
 import { initializeApp } from "firebase/app";
+import firebase from "firebase/compat/app";
 import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
 import SelectScrubber from "./container/OnDemand/SelectScrubber.jsx";
 import AppNavBar from "./component/AppNavBar/AppNavBar";
 import About from "./container/About";
 import Contact from "./container/Contact/Contact";
+import { useForm } from "./helpers/validation/useForm";
 
 function App() {
   const firebaseConfig = {
@@ -51,11 +54,9 @@ function App() {
   };
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  const storage = getStorage(app);
-  const picRef = ref(storage, "/test/img.png");
-  // uploadBytes(picRef, file).then((snapshot) => {
-  //   console.log("uploaded a blob or file..");
-  // });
+  const storage = getStorage();
+  const picRef = ref(storage, "test");
+
   const analytics = getAnalytics(app);
   const showLoader = () => {
     return (
@@ -77,6 +78,28 @@ function App() {
     let { from } = location.state || { from: { pathname: "/" } };
     let auth = useAuth();
     let history = useHistory();
+    const {
+      dataz, // handles form submission
+      handleChangez, // handles input changes
+      handleSubmitz, // access to the form data
+      errorsz, // includes the errors to show
+    } = useForm({
+      // the hook we are going to create
+      validations: {
+        // all our validation rules go here
+        email: {
+          pattern: {
+            value: "^[A-Za-z]*$",
+            message: "You're not allowed ...",
+          },
+        },
+      },
+      onSubmit: () => alert("User submitted!"),
+      initialValues: {
+        // used to initialize the data
+        name: "John",
+      },
+    });
     const [usernameInput, setUsernameInput] = useState();
     const [passwordInput, setPasswordInput] = useState();
     const [confirmPasswordInput, setConfirmPasswordInput] = useState();
@@ -85,6 +108,8 @@ function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
     const [isResettingPassword, setIsResettingPassword] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(true);
+
     const showLoader = () => {
       console.log("inside showLoader");
       return (
@@ -131,9 +156,6 @@ function App() {
     }, [isLoading]);
     useEffect(() => {});
 
-    const [usernameStyle, setUsernameStyle] = useState({});
-    const [passwordStyle, setPasswordStyle] = useState({});
-
     const createAccount = () => {
       let newAccountData = {
         email: emailInput,
@@ -141,22 +163,18 @@ function App() {
         confirmPassword: confirmPasswordInput,
         username: usernameInput,
       };
-      console.log("Account data: ", newAccountData);
       if (isCreatingAccount) {
         createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput)
           .then((userCredential) => {
             // Signed in
-            console.log("userCredential is: ", userCredential);
-            //const user = userCredential.user;
+            const user = userCredential.user;
             // ...
-            console.log("calling auth.signin");
-            // auth.signin((user) => {
-            //   console.log("inside callback");
-            //   history.replace(from);
-            //   history.push("/dashboard");
-            //   setIsLoading(false);
-            //   localStorage.setItem("user", JSON.stringify(user));
-            // }, user);
+            auth.signin((user) => {
+              history.replace(from);
+              history.push("/dashboard");
+              setIsLoading(true);
+              localStorage.setItem("user", JSON.stringify(user));
+            }, user);
           })
           .catch((error) => {
             const errorCode = error.code;
@@ -164,15 +182,12 @@ function App() {
             // ..
           });
       }
-      // handleSubmit();
-      console.log("Account created!");
     };
     const handleSubmit = () => {
-      console.log("calling handleSubmit");
       setIsLoading(true);
       const firebaseAuth = getAuth();
+      // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
       if (isCreatingAccount) {
-        console.log("account created!");
         createUserWithEmailAndPassword(auth, emailInput, passwordInput)
           .then((userCredential) => {
             // Signed in
@@ -197,7 +212,7 @@ function App() {
           .then((userCredential) => {
             // Signed in
             console.log(
-              "signing in with emai: ",
+              "signing in with email: ",
               emailInput,
               ", password: ",
               passwordInput
@@ -223,28 +238,22 @@ function App() {
           });
       }
     };
-
-    const validatePassword = (input) => {
-      console.log("Validating password", input);
-      if (input.length > 5) {
-        console.log("Changing style, password");
-        setPasswordStyle({ border: "1px solid green" });
-      } else if (input.length < 5 && input.length > 0) {
-        setPasswordStyle({ border: "1px solid red" });
-      } else if (input.length == 0) {
-        setPasswordStyle({});
-      }
-    };
-
-    const validateUsername = (field) => {
-      console.log("Validating username");
-      if (field.length > 5) {
-        setUsernameStyle({ border: "1px solid green" });
-      } else if (field.length < 5 && field.length > 0) {
-        setUsernameStyle({ border: "1px solid red" });
-      } else if (field.length == 0) {
-        setUsernameStyle({});
-      }
+    const handleSubmitForgotPassword = () => {
+      console.log("Attempting to send email...");
+      setIsLoading(true);
+      const auth = getAuth();
+      sendPasswordResetEmail(auth, emailInput)
+        .then(() => {
+          // Password reset email sent!
+          // ..
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log("An error occured while attempting to send email: ");
+          console.log("error code: ", error.code);
+          console.log("error message: ", error.message);
+        });
     };
 
     const goToDashboard = () => {
@@ -265,36 +274,36 @@ function App() {
       goToDashboard()
     ) : (
       <div className="container full-height">
-        <section class="login-clean">
+        <section className="login-clean">
           <form>
             <h1 style={{ color: "gray", textAlign: "center" }}>Scrubbit</h1>
-            <div class="illustration">
-              <i class="icon ion-waterdrop"></i>
+            <h6 style={{ color: "gray", textAlign: "center" }}>
+              Mobile Car Wash
+            </h6>
+            <div className="illustration">
+              <i className="icon ion-waterdrop"></i>
             </div>
-            <div class="mb-3">
+            <div className="mb-3">
+              {errorsz.email && <p className="error">{errorsz.email}</p>}
               <input
-                class="form-control"
+                className="form-control"
                 type="email"
                 name="email"
                 placeholder="Email"
                 onChange={(e) => {
-                  // validateUsername(e.target.value);
-                  setEmailInput(e.target.value);
-                  console.log("emailInput var is: ", emailInput);
+                  handleChangez("email", null, e);
                 }}
               />
             </div>
             {!isResettingPassword ? (
-              <div class="mb-3">
+              <div className="mb-3">
                 <input
-                  class="form-control"
+                  className="form-control"
                   type="password"
                   name="password"
                   placeholder="Password"
                   onChange={(e) => {
-                    validatePassword(e.target.value);
                     setPasswordInput(e.target.value);
-                    console.log("passwordInput is: ", passwordInput);
                   }}
                 />
               </div>
@@ -303,19 +312,14 @@ function App() {
             )}
             {isCreatingAccount ? (
               <div>
-                <div class="mb-3">
+                <div className="mb-3">
                   <input
-                    class="form-control"
+                    className="form-control"
                     type="password"
                     name="confirmPassword"
                     placeholder="Confirm Password"
                     onChange={(e) => {
-                      validatePassword(e.target.value);
                       setConfirmPasswordInput(e.target.value);
-                      console.log(
-                        "confirmPasswordInput is: ",
-                        confirmPasswordInput
-                      );
                     }}
                   />
                 </div>
@@ -325,9 +329,10 @@ function App() {
             )}
             {!isResettingPassword && !isCreatingAccount ? (
               <a
-                class="forgot"
+                className="forgot"
                 onClick={() => {
                   setIsResettingPassword(true);
+                  setIsCreatingAccount(false);
                 }}
               >
                 Forgot your email or password?
@@ -336,9 +341,9 @@ function App() {
               <div />
             )}
             {!isCreatingAccount && !isResettingPassword ? (
-              <div class="mb-3">
+              <div className="mb-3">
                 <button
-                  class="btn btn-primary d-block w-100"
+                  className="btn btn-primary d-block w-100"
                   type="button"
                   onClick={handleSubmit}
                 >
@@ -349,11 +354,11 @@ function App() {
               <div />
             )}
             {isResettingPassword ? (
-              <div class="mb-3">
+              <div className="mb-3">
                 <button
-                  class="btn btn-primary d-block w-100"
+                  className="btn btn-primary d-block w-100"
                   type="button"
-                  onClick={handleSubmit}
+                  onClick={handleSubmitForgotPassword}
                 >
                   Send email
                 </button>
@@ -361,9 +366,9 @@ function App() {
             ) : (
               <div />
             )}
-            {!isResettingPassword || !isCreatingAccount ? (
+            {!isResettingPassword ? (
               <button
-                class="btn btn-primary d-block w-100"
+                className="btn btn-primary d-block w-100"
                 type="button"
                 onClick={() => {
                   setIsCreatingAccount(true);
@@ -375,9 +380,9 @@ function App() {
             ) : (
               <div />
             )}
-            {
+            {isCreatingAccount || isResettingPassword ? (
               <a
-                class="forgot"
+                className="forgot"
                 onClick={() => {
                   setIsCreatingAccount(false);
                   setIsResettingPassword(false);
@@ -385,7 +390,20 @@ function App() {
               >
                 Cancel
               </a>
-            }
+            ) : (
+              <div />
+            )}
+            <p
+              style={{
+                color: "gray",
+                textAlign: "center",
+                fontSize: "10px",
+                paddingTop: "20px",
+                marginBottom: "-20px",
+              }}
+            >
+              © 2020 - 2022 Scrubbit Car Wash LLC
+            </p>
           </form>
         </section>
         <script src="assets/bootstrap/js/bootstrap.min.js"></script>
@@ -448,7 +466,9 @@ function App() {
     console.log("inside private route");
 
     let auth = useAuth();
+    let firebaseAuth = getAuth();
     console.log("calling auth.user, result is: ", auth.user);
+    console.log("Firebase auth: ", firebaseAuth);
     return (
       <Route
         {...rest}
@@ -489,7 +509,7 @@ function App() {
             </Route>
             <PrivateRoute path="/editProfile">
               <AppNavBar />
-              <EditProfile />
+              <EditProfile picRef={picRef} />
             </PrivateRoute>
             <PrivateRoute path="/dashboard">
               <AppNavBar />
