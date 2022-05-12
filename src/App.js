@@ -90,7 +90,13 @@ function App() {
         email: {
           pattern: {
             value: "^[A-Za-z]*$",
-            message: "You're not allowed ...",
+            message: "Invalid email address",
+          },
+        },
+        password: {
+          length: {
+            value: 8,
+            message: "Password must be at least 8 characters",
           },
         },
       },
@@ -183,10 +189,12 @@ function App() {
           });
       }
     };
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
       setIsLoading(true);
       const firebaseAuth = getAuth();
       // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
+      handleSubmitz(e);
+      console.log("errors: ", errorsz);
       if (isCreatingAccount) {
         createUserWithEmailAndPassword(auth, emailInput, passwordInput)
           .then((userCredential) => {
@@ -297,6 +305,9 @@ function App() {
             </div>
             {!isResettingPassword ? (
               <div className="mb-3">
+                {errorsz.password && (
+                  <p className="error">{errorsz.password}</p>
+                )}
                 <input
                   className="form-control"
                   type="password"
@@ -304,6 +315,7 @@ function App() {
                   placeholder="Password"
                   onChange={(e) => {
                     setPasswordInput(e.target.value);
+                    handleChangez("password", null, e);
                   }}
                 />
               </div>

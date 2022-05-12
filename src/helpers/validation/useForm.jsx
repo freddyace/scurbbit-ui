@@ -1,4 +1,5 @@
 import { useState } from "react";
+import validator from "validator";
 
 export const useForm = (options) => {
   console.log("in useForm");
@@ -15,6 +16,7 @@ export const useForm = (options) => {
   };
 
   const handleSubmitz = async (e) => {
+    console.log("in handle submits");
     e.preventDefault();
     const validations = options?.validations;
     if (validations) {
@@ -29,11 +31,15 @@ export const useForm = (options) => {
         }
 
         const pattern = validation?.pattern;
-        if (pattern?.value && !RegExp(pattern.value).test(value)) {
+        if (pattern && !validator.isEmail(value)) {
           valid = false;
           newErrors[key] = pattern.message;
         }
-
+        const length = validation?.length?.value;
+        if (length && value.length < length) {
+          valid = false;
+          newErrors[key] = validation?.length?.message;
+        }
         const custom = validation?.custom;
         if (custom?.isValid && !custom.isValid(value)) {
           valid = false;
