@@ -31,14 +31,20 @@ export const useForm = (options) => {
         }
 
         const pattern = validation?.pattern;
-        if (pattern && !validator.isEmail(value)) {
+        if (pattern?.value && RegExp(pattern.value).test(value)) {
           valid = false;
           newErrors[key] = pattern.message;
         }
         const length = validation?.length?.value;
-        if (length && value.length < length) {
+        if (length && value?.length < length) {
           valid = false;
           newErrors[key] = validation?.length?.message;
+        }
+        const match = validation?.match?.value;
+        const passwordInput = dataz["password"];
+        if (match && value && passwordInput && value !== passwordInput) {
+          valid = false;
+          newErrors[key] = validation?.match?.message;
         }
         const custom = validation?.custom;
         if (custom?.isValid && !custom.isValid(value)) {

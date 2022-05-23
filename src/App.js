@@ -40,7 +40,7 @@ import AppNavBar from "./component/AppNavBar/AppNavBar";
 import About from "./container/About";
 import Contact from "./container/Contact/Contact";
 import { useForm } from "./helpers/validation/useForm";
-
+import { firebaseErrorConstants } from "./helpers/firebaseErrorConstants";
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
@@ -92,15 +92,29 @@ function App() {
             value: "^[A-Za-z]*$",
             message: "Invalid email address",
           },
+          required: {
+            value: true,
+            message: "Email address is required",
+          },
         },
         password: {
           length: {
             value: 8,
             message: "Password must be at least 8 characters",
           },
+          required: {
+            value: true,
+            message: "Password is required",
+          },
+        },
+        confirmPassword: {
+          match: {
+            value: true,
+            message: "Passwords must match",
+          },
         },
       },
-      onSubmit: () => alert("User submitted!"),
+      onSubmit: () => console.log("Form submitted..."),
       initialValues: {
         // used to initialize the data
         name: "John",
@@ -115,7 +129,7 @@ function App() {
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
     const [isResettingPassword, setIsResettingPassword] = useState(false);
     const [isLoggingIn, setIsLoggingIn] = useState(true);
-
+    const [firebaseValidationError, setFirebaseValidationError] = useState();
     const showLoader = () => {
       console.log("inside showLoader");
       return (
@@ -162,7 +176,8 @@ function App() {
     }, [isLoading]);
     useEffect(() => {});
 
-    const createAccount = () => {
+    const createAccount = (e) => {
+      setIsLoading(true);
       let newAccountData = {
         email: emailInput,
         password: passwordInput,
@@ -170,6 +185,12 @@ function App() {
         username: usernameInput,
       };
       if (isCreatingAccount) {
+        handleSubmitz(e);
+        const hasValidationErrors = Object.keys(errorsz).length > 0;
+        if (hasValidationErrors) {
+          setIsLoading(false);
+          return;
+        }
         createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput)
           .then((userCredential) => {
             // Signed in
@@ -184,18 +205,36 @@ function App() {
           })
           .catch((error) => {
             const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
+            console.log(
+              "An error occurred while attempting to create account..."
+            );
+            console.log("Error is: ");
+            console.log("Error code: ", errorCode);
+            console.log("Error message: ", error.message);
+            if (
+              error.errorCode === firebaseErrorConstants.EMAIL_ALREADY_IN_USE
+            ) {
+              setFirebaseValidationError(
+                "An account with that email already exists"
+              );
+            } else {
+              setFirebaseValidationError("Invalid email or password");
+            }
           });
       }
+      setIsLoading(false);
     };
     const handleSubmit = (e) => {
-      setIsLoading(true);
       const firebaseAuth = getAuth();
       // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
       handleSubmitz(e);
-      console.log("errors: ", errorsz);
+      const hasValidationErrors = Object.keys(errorsz).length > 0;
+      if (hasValidationErrors) {
+        setIsLoading(false);
+        return;
+      }
       if (isCreatingAccount) {
+        setIsLoading(true);
         createUserWithEmailAndPassword(auth, emailInput, passwordInput)
           .then((userCredential) => {
             // Signed in
@@ -214,10 +253,18 @@ function App() {
             const errorCode = error.code;
             const errorMessage = error.message;
             // ..
+            setIsLoading(false);
           });
       } else {
+        handleSubmitz(e);
+        const hasValidationErrors = Object.keys(errorsz).length > 0;
+        if (hasValidationErrors) {
+          setIsLoading(false);
+          return;
+        }
         signInWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
           .then((userCredential) => {
+            setIsLoading(true);
             // Signed in
             console.log(
               "signing in with email: ",
@@ -232,13 +279,20 @@ function App() {
               console.log("inside callback");
               history.replace(from);
               history.push("/dashboard");
-              setIsLoading(false);
               localStorage.setItem("user", JSON.stringify(user));
             }, user);
+            setIsLoading(false);
           })
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
+            if (error.errorCode === "400") {
+              setFirebaseValidationError("Invalid email or password");
+            } else {
+              setFirebaseValidationError(
+                "An error occured during authentication..."
+              );
+            }
             setTimeout(() => {
               console.log("An error occured during authentication....");
               setIsLoading(false);
@@ -246,10 +300,16 @@ function App() {
           });
       }
     };
-    const handleSubmitForgotPassword = () => {
+    const handleSubmitForgotPassword = (e) => {
       console.log("Attempting to send email...");
       setIsLoading(true);
+      handleSubmitz(e);
       const auth = getAuth();
+      const hasValidationErrors = Object.keys(errorsz).length > 0;
+      if (hasValidationErrors) {
+        setIsLoading(false);
+        return;
+      }
       sendPasswordResetEmail(auth, emailInput)
         .then(() => {
           // Password reset email sent!
@@ -261,6 +321,7 @@ function App() {
           console.log("An error occured while attempting to send email: ");
           console.log("error code: ", error.code);
           console.log("error message: ", error.message);
+          setIsLoading(false);
         });
     };
 
@@ -293,12 +354,16 @@ function App() {
             </div>
             <div className="mb-3">
               {errorsz.email && <p className="error">{errorsz.email}</p>}
+              {firebaseValidationError && (
+                <p className="error">{firebaseValidationError}</p>
+              )}
               <input
                 className="form-control"
                 type="email"
                 name="email"
                 placeholder="Email"
                 onChange={(e) => {
+                  setEmailInput(e.target.value);
                   handleChangez("email", null, e);
                 }}
               />
@@ -325,6 +390,9 @@ function App() {
             {isCreatingAccount ? (
               <div>
                 <div className="mb-3">
+                  {errorsz.confirmPassword && (
+                    <p className="error">{errorsz.confirmPassword}</p>
+                  )}
                   <input
                     className="form-control"
                     type="password"
@@ -332,6 +400,7 @@ function App() {
                     placeholder="Confirm Password"
                     onChange={(e) => {
                       setConfirmPasswordInput(e.target.value);
+                      handleChangez("confirmPassword", null, e);
                     }}
                   />
                 </div>
@@ -382,9 +451,10 @@ function App() {
               <button
                 className="btn btn-primary d-block w-100"
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  console.log("onClick!");
                   setIsCreatingAccount(true);
-                  createAccount();
+                  createAccount(e);
                 }}
               >
                 Create Account
