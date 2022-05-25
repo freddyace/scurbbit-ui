@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import profilePic from "../../container/Dashboard/img/img.png";
+import defaultProfilePicFile from "../../container/Dashboard/img/img.png";
 import { Redirect } from "react-router-dom";
-const AppNavBar = () => {
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
+const AppNavBar = (props) => {
   const [navBarStyles, setNavBarStyles] = useState("collapse navbar-collapse");
   const [showNavBar, setShowNavBar] = useState(false);
   let history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
+  const [profilePic, setProfilePic] = useState();
 
+  useEffect(()=>{
+    console.log("Attempting to fetch user info...")
+    console.log("photo url: ", props?.auth?.currentUser?.photoURL)
+    setProfilePic(props?.auth?.currentUser?.photoURL)
+  })
   return (
     <nav
       className="navbar navbar-light navbar-expand-md"

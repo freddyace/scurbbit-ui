@@ -41,6 +41,7 @@ import About from "./container/About";
 import Contact from "./container/Contact/Contact";
 import { useForm } from "./helpers/validation/useForm";
 import { firebaseErrorConstants } from "./helpers/firebaseErrorConstants";
+import { auth } from "firebaseui";
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyDfDJ5iGlPm38EQpGd_moFi_dq_GXEfiSo",
@@ -55,7 +56,8 @@ function App() {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const storage = getStorage();
-  const picRef = ref(storage, "test");
+  // const picRef = ref(storage);
+  const firebaseAuth = getAuth();
 
   const analytics = getAnalytics(app);
   const showLoader = () => {
@@ -83,6 +85,7 @@ function App() {
       handleChangez, // handles input changes
       handleSubmitz, // access to the form data
       errorsz, // includes the errors to show
+      clearErrors
     } = useForm({
       // the hook we are going to create
       validations: {
@@ -141,13 +144,8 @@ function App() {
             padding: "10px",
           }}
         >
-          <Loader
-            type="Puff"
-            color="#00BFFF"
-            height={100}
-            width={100}
-            timeout={30000} //3 secs
-          />
+        <div class="lds-ripple"><div></div><div></div></div>
+
         </div>
       );
     };
@@ -227,6 +225,8 @@ function App() {
     const handleSubmit = (e) => {
       const firebaseAuth = getAuth();
       // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
+      clearErrors()
+      setFirebaseValidationError()
       handleSubmitz(e);
       const hasValidationErrors = Object.keys(errorsz).length > 0;
       if (hasValidationErrors) {
@@ -286,7 +286,7 @@ function App() {
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            if (error.errorCode === "400") {
+            if (errorCode === "auth/wrong-password") {
               setFirebaseValidationError("Invalid email or password");
             } else {
               setFirebaseValidationError(
@@ -314,6 +314,7 @@ function App() {
         .then(() => {
           // Password reset email sent!
           // ..
+          setIsLoading(false);
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -583,22 +584,22 @@ function App() {
               <SelectScrubber />
             </PrivateRoute>
             <Route path="/about">
-              <AppNavBar />
+              <AppNavBar storage={storage} auth={firebaseAuth} />
               <About />
             </Route>
             <Route path="/createAccount">
               <CreateAccount />
             </Route>
             <PrivateRoute path="/editProfile">
-              <AppNavBar />
-              <EditProfile picRef={picRef} />
+              <AppNavBar storage={storage} auth={firebaseAuth}/>
+              <EditProfile storage={storage} auth={firebaseAuth} />
             </PrivateRoute>
             <PrivateRoute path="/dashboard">
-              <AppNavBar />
+              <AppNavBar storage={storage} auth={firebaseAuth} />
               <Dashboard />
             </PrivateRoute>
             <PrivateRoute path="/contact">
-              <AppNavBar />
+              <AppNavBar storage={storage} auth={firebaseAuth} />
               <Contact />
             </PrivateRoute>
             <Route path="/">

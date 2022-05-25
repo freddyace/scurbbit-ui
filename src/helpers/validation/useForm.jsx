@@ -1,5 +1,4 @@
 import { useState } from "react";
-import validator from "validator";
 
 export const useForm = (options) => {
   console.log("in useForm");
@@ -7,16 +6,16 @@ export const useForm = (options) => {
   const [errorsz, setErrors] = useState({});
 
   const handleChangez = (key, sanitizeFn, e) => {
-    console.log("in handleChange");
     const value = sanitizeFn ? sanitizeFn(e.target.value) : e.target.value;
     setData({
       ...dataz,
       [key]: value,
     });
   };
-
+  const clearErrors = () =>{
+    setErrors({});
+  }
   const handleSubmitz = async (e) => {
-    console.log("in handle submits");
     e.preventDefault();
     const validations = options?.validations;
     if (validations) {
@@ -71,5 +70,6 @@ export const useForm = (options) => {
     handleChangez,
     handleSubmitz,
     errorsz,
+    clearErrors
   };
 };

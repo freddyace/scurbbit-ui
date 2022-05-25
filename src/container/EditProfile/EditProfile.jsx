@@ -4,19 +4,72 @@ import "./assets/css/Navigation-Menu.css";
 import "./assets/css/Pricing-Table---EspacioBinariocom.css";
 import "./assets/css/Profile-Edit-Form.css";
 import "./assets/css/styles.css";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-import { useState } from "react";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useState, useEffect } from "react";
 import { validateEditAccount } from "../../helpers/validation/useForm";
+import { updateProfile } from "firebase/auth";
+
 const EditProfile = (props) => {
   const [file, setfile] = useState();
+  const userEmail = props?.auth?.currentUser?.email
+  const filePathRef = ref(props.storage, userEmail+'/profilePic')
+  const [profilePicture, setProfilePicture] = useState({profilePic})
+
+  useEffect(()=> {
+    console.log("Attempting to fetch profile pic...")
+  })
+  const downloadFirebaseImg = () => {
+    getDownloadURL(ref(props.storage, filePathRef))
+  .then((url) => {
+    // `url` is the download URL for 'images/stars.jpg'
+    console.log("image url is: ", url)
+    setProfilePicture(url);
+    // profilePic = url
+    updateProfile(props?.auth?.currentUser, {
+      photoURL: url
+    }).then(() => {
+      // Profile updated!
+      // ...
+      console.log("profile updated")
+    }).catch((error) => {
+      // An error occurred
+      // ...
+      console.log('An error occurred when trying to upload the picture.')
+    });
+    // This can be downloaded directly:
+
+    // TODO: Don't need this yet...will need to cache this for PROD - Freddy
+    // const xhr = new XMLHttpRequest();
+    // xhr.responseType = 'blob';
+    // xhr.onload = (event) => {
+    //   const blob = xhr.response;
+    // };
+    // xhr.open('GET', url);
+    // xhr.send();
+
+    // // Or inserted into an <img> element
+    // const img = document.getElementById('myimg');
+    // img.setAttribute('src', url);
+  })
+  .catch((error) => {
+    // Handle any errors
+  });
+  }
+
   const changeHandler = (event) => {
     setfile(event.target.files[0]);
   };
+  useEffect(() => {
+    console.log("firebase Auth: ", props.auth)
+    console.log("user's email is: ", userEmail)
+  })
   const onSubmit = () => {
     console.log("uploading file");
     try {
-      uploadBytes(props.picRef, file).then((snapshot) => {
+      uploadBytes(filePathRef, file).then((snapshot) => {
         console.log("uploaded a blob or file..");
+        downloadFirebaseImg();
+
       });
     } catch (e) {
       console.log(e);
@@ -48,8 +101,8 @@ const EditProfile = (props) => {
                 className="avatar-bg center"
                 style={{
                   background: `url(${
-                    profilePic
-                      ? profilePic
+                    profilePicture
+                      ? profilePicture
                       : "url(https://www.gravatar.com/avatar/1234566?size=200&d=mm)"
                   })`,
                 }}
