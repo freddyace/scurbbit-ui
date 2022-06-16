@@ -8,15 +8,20 @@ const Contact = () => {
   const [state, setState] = useState(null);
   const database = getDatabase();
 
-  const handleChange = (event) =>{
-    console.log(event.target.value)
-  }
-  const handleFirstNameChange = (event) => {
-    
-  }
-  useEffect(()=>{
-
-  }, [firstname, lastname])
+  const handleChange = (event) => {
+    console.log(event.target.value);
+  };
+  const handleCountyChange = (event) => {
+    setFirstname(event.target.value);
+  };
+  const handleStateChange = (event) => {
+    console.log(event.target.value);
+  };
+  const handleFirstNameChange = (event) => {};
+  const handleLastNameChange = (event) => {
+    console.log(event.target.value);
+  };
+  useEffect(() => {}, [firstname, lastname]);
   return (
     <div>
       <div className="contact">
@@ -39,7 +44,9 @@ const Contact = () => {
           type="text"
           id="lname"
           name="lastname"
-          placeholder="Last name.."fd c
+          placeholder="Last name.."
+          fd
+          c
         />
 
         <label for="state">State</label>
@@ -54,6 +61,7 @@ const Contact = () => {
           <option value="Clayton">Clayton</option>
           <option value="Henry">Henry</option>
         </select>
+        <label for="message">Message</label>
         <textarea id="message">Some text...</textarea>
 
         <button

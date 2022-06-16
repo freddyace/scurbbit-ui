@@ -85,7 +85,7 @@ function App() {
       handleChangez, // handles input changes
       handleSubmitz, // access to the form data
       errorsz, // includes the errors to show
-      clearErrors
+      clearErrors,
     } = useForm({
       // the hook we are going to create
       validations: {
@@ -133,6 +133,10 @@ function App() {
     const [isResettingPassword, setIsResettingPassword] = useState(false);
     const [isLoggingIn, setIsLoggingIn] = useState(true);
     const [firebaseValidationError, setFirebaseValidationError] = useState();
+    const [
+      createAccountProcessInitiated,
+      setCreateAccountProcessInitiated,
+    ] = useState(false);
     const showLoader = () => {
       console.log("inside showLoader");
       return (
@@ -144,8 +148,10 @@ function App() {
             padding: "10px",
           }}
         >
-        <div class="lds-ripple"><div></div><div></div></div>
-
+          <div class="lds-ripple">
+            <div></div>
+            <div></div>
+          </div>
         </div>
       );
     };
@@ -225,8 +231,8 @@ function App() {
     const handleSubmit = (e) => {
       const firebaseAuth = getAuth();
       // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
-      clearErrors()
-      setFirebaseValidationError()
+      clearErrors();
+      setFirebaseValidationError();
       handleSubmitz(e);
       const hasValidationErrors = Object.keys(errorsz).length > 0;
       if (hasValidationErrors) {
@@ -448,7 +454,23 @@ function App() {
             ) : (
               <div />
             )}
-            {!isResettingPassword ? (
+            {!isResettingPassword && !createAccountProcessInitiated ? (
+              <button
+                className="btn btn-primary d-block w-100"
+                type="button"
+                onClick={(e) => {
+                  console.log("onClick!");
+                  setIsCreatingAccount(true);
+                  setCreateAccountProcessInitiated(true);
+                  createAccount(e);
+                }}
+              >
+                Create Account
+              </button>
+            ) : (
+              <div />
+            )}
+            {createAccountProcessInitiated ? (
               <button
                 className="btn btn-primary d-block w-100"
                 type="button"
@@ -458,7 +480,7 @@ function App() {
                   createAccount(e);
                 }}
               >
-                Create Account
+                Next
               </button>
             ) : (
               <div />
@@ -591,7 +613,7 @@ function App() {
               <CreateAccount />
             </Route>
             <PrivateRoute path="/editProfile">
-              <AppNavBar storage={storage} auth={firebaseAuth}/>
+              <AppNavBar storage={storage} auth={firebaseAuth} />
               <EditProfile storage={storage} auth={firebaseAuth} />
             </PrivateRoute>
             <PrivateRoute path="/dashboard">

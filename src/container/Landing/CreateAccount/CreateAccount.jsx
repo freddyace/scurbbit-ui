@@ -81,7 +81,7 @@ const CreateAccount = () => {
                     />
                     <Link to="/">Cancel</Link>
                     <button class="btn btn-primary btn-block" type="submit">
-                      Create Account
+                      Next
                     </button>
                   </fieldset>
                 </form>
