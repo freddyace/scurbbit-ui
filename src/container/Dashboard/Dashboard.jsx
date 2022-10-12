@@ -36,7 +36,7 @@ const Dashboard = () => {
                     <li>
                       23 Scrubbers online in <b>30253</b>
                       <span className="fa-li">
-                      <PulsatingDot />
+                        <PulsatingDot />
                       </span>
                     </li>
                   </ul>

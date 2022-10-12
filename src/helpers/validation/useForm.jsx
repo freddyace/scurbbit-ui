@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 export const useForm = (options) => {
-  console.log("in useForm");
   const [dataz, setData] = useState(options?.initialValues || {});
   const [errorsz, setErrors] = useState({});
 
@@ -12,11 +11,13 @@ export const useForm = (options) => {
       [key]: value,
     });
   };
-  const clearErrors = () =>{
+  const clearErrors = () => {
     setErrors({});
-  }
+  };
   const handleSubmitz = async (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     const validations = options?.validations;
     if (validations) {
       let valid = true;
@@ -70,6 +71,6 @@ export const useForm = (options) => {
     handleChangez,
     handleSubmitz,
     errorsz,
-    clearErrors
+    clearErrors,
   };
 };

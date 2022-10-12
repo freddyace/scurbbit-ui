@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, set } from "firebase/database";
 import "./stylesheet.css";
-const Contact = () => {
+const Contact = (props) => {
   const [firstname, setFirstname] = useState(null);
   const [lastname, setLastname] = useState(null);
   const [county, setCounty] = useState(null);
