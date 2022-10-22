@@ -26,7 +26,6 @@ import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
 import { initializeApp } from "firebase/app";
-import firebase from "firebase/compat/app";
 import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
@@ -42,6 +41,7 @@ import Contact from "./container/Contact/Contact";
 import { useForm } from "./helpers/validation/useForm";
 import { firebaseErrorConstants } from "./helpers/firebaseErrorConstants";
 import { auth } from "firebaseui";
+import { useAuth, ProvideAuth } from "./helpers/context/useAuth.jsx";
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyCWL_temTPCHVn4wceJ5SAW-wIWoO2dVFc",
@@ -78,7 +78,7 @@ function App() {
     const [picture, setPicture] = useState("");
     let location = useLocation();
     let { from } = location.state || { from: { pathname: "/" } };
-    let auth = useAuth();
+    let scrubbitAuth = useAuth();
     let history = useHistory();
     const {
       dataz, // handles form submission
@@ -215,7 +215,7 @@ function App() {
         setIsLoading(true);
       }
     }, [isLoading]);
-
+    useEffect(() => {});
     const handleCancelClicked = () => {
       showLoginForm();
     };
@@ -322,55 +322,6 @@ function App() {
         zip !== undefined;
       return result;
     };
-    const createAccount = (e) => {
-      console.log("in createAccount");
-      setIsLoading(true);
-      let newAccountData = {
-        email: emailInput,
-        password: passwordInput,
-        confirmPassword: confirmPasswordInput,
-        username: usernameInput,
-      };
-      if (isCreatingAccount) {
-        handleSubmitz(e);
-        const hasValidationErrors = Object.keys(errorsz).length > 0;
-        if (hasValidationErrors) {
-          setIsLoading(false);
-          return;
-        }
-        createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput)
-          .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            // ...
-            auth.signin((user) => {
-              history.replace(from);
-              history.push("/dashboard");
-              setIsLoading(true);
-              localStorage.setItem("user", JSON.stringify(user));
-            }, user);
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            console.log(
-              "An error occurred while attempting to create account..."
-            );
-            console.log("Error is: ");
-            console.log("Error code: ", errorCode);
-            console.log("Error message: ", error.message);
-            if (
-              error.errorCode === firebaseErrorConstants.EMAIL_ALREADY_IN_USE
-            ) {
-              setFirebaseValidationError(
-                "An account with that email already exists"
-              );
-            } else {
-              setFirebaseValidationError("Invalid email or password");
-            }
-          });
-      }
-      setIsLoading(false);
-    };
     const handleSubmit = (e) => {
       const firebaseAuth = getAuth();
       // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
@@ -384,26 +335,6 @@ function App() {
       }
       if (isCreatingAccount) {
         setIsLoading(true);
-        createUserWithEmailAndPassword(auth, emailInput, passwordInput)
-          .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            // ...
-            console.log("calling auth.signin");
-            // auth.signin((user) => {
-            //   console.log("inside callback");
-            //   history.replace(from);
-            //   history.push("/dashboard");
-            //   setIsLoading(false);
-            //   localStorage.setItem("user", JSON.stringify(user));
-            // }, user);
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
-            setIsLoading(false);
-          });
       } else {
         handleSubmitz(e);
         const hasValidationErrors = Object.keys(errorsz).length > 0;
@@ -411,42 +342,8 @@ function App() {
           setIsLoading(false);
           return;
         }
-        signInWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
-          .then((userCredential) => {
-            setIsLoading(true);
-            // Signed in
-            console.log(
-              "signing in with email: ",
-              emailInput,
-              ", password: ",
-              passwordInput
-            );
-            const user = userCredential.user;
-            // ...
-            console.log("calling auth.signin");
-            auth.signin((user) => {
-              console.log("inside callback");
-              history.replace(from);
-              history.push("/dashboard");
-              localStorage.setItem("user", JSON.stringify(user));
-            }, user);
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            if (errorCode === "auth/wrong-password") {
-              setFirebaseValidationError("Invalid email or password");
-            } else {
-              setFirebaseValidationError(
-                "An error occured during authentication..."
-              );
-            }
-            setTimeout(() => {
-              console.log("An error occured during authentication....");
-              setIsLoading(false);
-            }, 3000);
-          });
+        scrubbitAuth.signin(emailInput, passwordInput);
+        history.push("/dashboard");
       }
     };
 
@@ -875,54 +772,6 @@ function App() {
     );
   };
   // ----End of login Landing
-  const authContext = createContext();
-  function ProvideAuth({ children }) {
-    const auth = useProvideAuth();
-    return <authContext.Provider value={auth}>{children}</authContext.Provider>;
-  }
-  function useAuth() {
-    return useContext(authContext);
-  }
-  function useProvideAuth() {
-    const [user, setUser] = useState(null);
-    const signin = (cb, userArg) => {
-      return fakeAuth.signin((user) => {
-        console.log("in fakeAuth.signin");
-        setUser(userArg);
-        cb(userArg);
-      }, userArg);
-    };
-
-    const signout = (cb) => {
-      return fakeAuth.signout(() => {
-        setUser(null);
-        cb();
-      });
-    };
-
-    return {
-      user,
-      signin,
-      signout,
-    };
-  }
-  const fakeAuth = {
-    isAuthenticated: false,
-    signin(cb, user) {
-      if (user) {
-        fakeAuth.isAuthenticated = true;
-        setTimeout(cb, 1000); // fake async
-      } else {
-        fakeAuth.isAuthenticated = false;
-        setTimeout(cb, 1000); // fake async
-      }
-    },
-    signout(cb) {
-      fakeAuth.isAuthenticated = false;
-      setTimeout(cb, 1000);
-    },
-  };
-
   function PrivateRoute({ children, ...rest }) {
     console.log("inside private route");
 

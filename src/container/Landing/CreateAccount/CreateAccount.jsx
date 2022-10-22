@@ -25,6 +25,7 @@ import {
 import Spinner from "../../../component/loader/Spinner.jsx";
 import { firebaseErrorConstants } from "../../../helpers/firebaseErrorConstants";
 import "./Terms.css";
+import { useAuth } from "../../../helpers/context/useAuth.jsx";
 
 const CreateAccount = (props) => {
   const Landing = () => {
@@ -34,7 +35,7 @@ const CreateAccount = (props) => {
     let { from } = location.state || { from: { pathname: "/" } };
     let history = useHistory();
     let firebaseAuth = props.firebaseAuth;
-    const auth = props.auth;
+    const auth = useAuth();
     const {
       dataz, // handles form submission
       handleChangez, // handles input changes
@@ -364,35 +365,9 @@ const CreateAccount = (props) => {
         setIsLoading(false);
         return;
       }
-      createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          const auth1 = props.auth;
-          // ...
-          auth1.signin((user) => {
-            history.replace(from);
-            history.push("/dashboard");
-            setIsLoading(true);
-            localStorage.setItem("user", JSON.stringify(user));
-          }, user);
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          console.log(
-            "An error occurred while attempting to create account..."
-          );
-          console.log("Error is: ");
-          console.log("Error code: ", errorCode);
-          console.log("Error message: ", error.message);
-          if (error.errorCode === firebaseErrorConstants.EMAIL_ALREADY_IN_USE) {
-            setFirebaseValidationError(
-              "An account with that email already exists"
-            );
-          } else {
-            setFirebaseValidationError("Invalid email or password");
-          }
-        });
+      auth.signup(emailInput, passwordInput);
+      history.replace(from);
+      history.push("/dashboard");
       setIsLoading(false);
     };
     const handleSubmit = (e) => {
