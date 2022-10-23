@@ -3,7 +3,6 @@ import { useState } from "react";
 export const useForm = (options) => {
   const [dataz, setData] = useState(options?.initialValues || {});
   const [errorsz, setErrors] = useState({});
-
   const handleChangez = (key, sanitizeFn, e) => {
     const value = sanitizeFn ? sanitizeFn(e.target.value) : e.target.value;
     setData({
@@ -14,7 +13,14 @@ export const useForm = (options) => {
   const clearErrors = () => {
     setErrors({});
   };
-  const handleSubmitz = async (e) => {
+  const emailIsValid = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+  const handleSubmitz = async (e, callback) => {
     if (e) {
       e.preventDefault();
     }
@@ -31,7 +37,7 @@ export const useForm = (options) => {
         }
 
         const pattern = validation?.pattern;
-        if (pattern?.value && RegExp(pattern.value).test(value)) {
+        if (pattern?.value && !emailIsValid(value)) {
           valid = false;
           newErrors[key] = pattern.message;
         }
@@ -54,16 +60,16 @@ export const useForm = (options) => {
       }
 
       if (!valid) {
-        setErrors(newErrors);
+        setErrors(newErrors, callback);
         return;
       }
     }
 
-    setErrors({});
-
-    if (options?.onSubmit) {
-      options.onSubmit();
-    }
+    setErrors({}, callback);
+    // don't need this yet
+    // if (options?.onSubmit) {
+    //   options.onSubmit();
+    // }
   };
 
   return {

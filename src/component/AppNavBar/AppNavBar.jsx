@@ -105,7 +105,7 @@ const AppNavBar = (props) => {
             <li className="nav-item">
               <a
                 className="nav-link"
-                href="#"
+                href=""
                 style={{ color: "white" }}
                 onClick={() => {
                   console.log("signing out...");
