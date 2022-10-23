@@ -18,7 +18,7 @@ const Dashboard = () => {
   return isLoading ? (
     <Spinner />
   ) : (
-    <div>
+    <div id="t">
       <section className="pricing py-5" style={{ background: "white" }}>
         <div className="container">
           <div className="row">

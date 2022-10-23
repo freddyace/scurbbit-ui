@@ -319,6 +319,9 @@ const Landing = () => {
             {firebaseValidationError && (
               <p className="error">{firebaseValidationError}</p>
             )}
+            {scrubbitAuth.firebaseValidationError && (
+              <p className="error">{scrubbitAuth.firebaseValidationError}</p>
+            )}
             {showEmailField ? (
               <input
                 className="form-control"

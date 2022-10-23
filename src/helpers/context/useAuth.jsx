@@ -56,14 +56,15 @@ function useProvideAuth() {
   const signin = (callback, emailInput, passwordInput) => {
     signInWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
       .then((userCredential) => {
-        //setIsLoading(true);
-        // Signed in
-        console.log(
-          "signing in with email: ",
-          emailInput,
-          ", password: ",
-          passwordInput
-        );
+        if (!userCredential?.user?.emailVerified) {
+          console.log("Email is not verified, exiting");
+          setFirebaseValidationError(
+            "Please verify your email address before signing in."
+          );
+          signOut(firebaseAuth);
+          return;
+        }
+        console.log("Email is verified!");
         setUser(userCredential.user);
         console.log("inside callback");
         //history.replace(from);
@@ -113,7 +114,7 @@ function useProvideAuth() {
         };
         console.log("url is: ", actionCodeSettings.url);
         sendEmailVerification(userCredential.user, actionCodeSettings);
-        applyActionCode();
+        //applyActionCode();
         //localStorage.setItem("user", JSON.stringify(userCredential.user));
       })
       .catch((error) => {
@@ -126,6 +127,7 @@ function useProvideAuth() {
 
   return {
     user,
+    firebaseValidationError,
     signin,
     signout,
     signup,
