@@ -53,7 +53,7 @@ function useProvideAuth() {
   const [user, setUser] = useState(null);
   const [firebaseValidationError, setFirebaseValidationError] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const signin = (emailInput, passwordInput) => {
+  const signin = (callback, emailInput, passwordInput) => {
     signInWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
       .then((userCredential) => {
         //setIsLoading(true);
@@ -69,8 +69,10 @@ function useProvideAuth() {
         //history.replace(from);
         localStorage.setItem("user", JSON.stringify(user));
         setIsLoading(false);
+        callback();
       })
       .catch((error) => {
+        console.log("error is: ", error);
         const errorCode = error.code;
         const errorMessage = error.message;
         if (errorCode === "auth/wrong-password") {
