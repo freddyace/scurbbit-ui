@@ -367,7 +367,7 @@ const CreateAccount = (props) => {
       }
       auth.signup(emailInput, passwordInput);
       history.replace(from);
-      history.push("/dashboard");
+      history.push("/verification");
       setIsLoading(false);
     };
     const handleSubmit = (e) => {

@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  createContext,
-  useRef,
-} from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import "./Login-Form-Clean.css";
 import "./bootstrap.min.css";
@@ -14,25 +8,18 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   Redirect,
   useHistory,
   useLocation,
 } from "react-router-dom";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import FacebookLogin from "react-facebook-login";
-// import { Card, Image } from 'react-bootstrap';
 import Dashboard from "../src/container/Dashboard/Dashboard.jsx";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
 import SelectScrubber from "./container/OnDemand/SelectScrubber.jsx";
 import AppNavBar from "./component/AppNavBar/AppNavBar";
@@ -42,6 +29,7 @@ import { useForm } from "./helpers/validation/useForm";
 import { firebaseErrorConstants } from "./helpers/firebaseErrorConstants";
 import { auth } from "firebaseui";
 import { useAuth, ProvideAuth } from "./helpers/context/useAuth.jsx";
+import EmailVerification from "./container/Landing/CreateAccount/Verification/EmailVerification";
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyCWL_temTPCHVn4wceJ5SAW-wIWoO2dVFc",
@@ -813,6 +801,9 @@ function App() {
             <Route path="/about">
               <AppNavBar storage={storage} auth={firebaseAuth} />
               <About />
+            </Route>
+            <Route path="/verification">
+              <EmailVerification />
             </Route>
             <Route path="/createAccount">
               <CreateAccount

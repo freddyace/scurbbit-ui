@@ -11,6 +11,8 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  sendEmailVerification,
+  applyActionCode,
 } from "firebase/auth";
 import {
   BrowserRouter as Router,
@@ -92,11 +94,25 @@ function useProvideAuth() {
     createUserWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
       .then((userCredential) => {
         // Signed in
-        setUser(userCredential.user);
+        //setUser(userCredential.user);
         // ...
-        console.log("calling auth.signin");
-        console.log("inside callback");
-        localStorage.setItem("user", JSON.stringify(userCredential.user));
+        console.log("Successfully created user");
+        const actionCodeSettings = {
+          url: "https://scrubbit-dev-336218.web.app",
+          // iOS: {
+          //   bundleId: "com.example.ios",
+          // },
+          // android: {
+          //   packageName: "com.example.android",
+          //   installApp: true,
+          //   minimumVersion: "12",
+          // },
+          handleCodeInApp: false,
+        };
+        console.log("url is: ", actionCodeSettings.url);
+        sendEmailVerification(userCredential.user, actionCodeSettings);
+        applyActionCode();
+        //localStorage.setItem("user", JSON.stringify(userCredential.user));
       })
       .catch((error) => {
         const errorCode = error.code;

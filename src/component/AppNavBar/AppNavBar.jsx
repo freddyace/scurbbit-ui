@@ -11,11 +11,11 @@ const AppNavBar = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [profilePic, setProfilePic] = useState();
 
-  useEffect(()=>{
-    console.log("Attempting to fetch user info...")
-    console.log("photo url: ", props?.auth?.currentUser?.photoURL)
-    setProfilePic(props?.auth?.currentUser?.photoURL)
-  })
+  useEffect(() => {
+    console.log("Attempting to fetch user info...");
+    console.log("photo url: ", props?.auth?.currentUser?.photoURL);
+    setProfilePic(props?.auth?.currentUser?.photoURL);
+  });
   return (
     <nav
       className="navbar navbar-light navbar-expand-md"
