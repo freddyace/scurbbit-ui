@@ -12,16 +12,17 @@ import { getDatabase, set } from "firebase/database";
 
 const EditProfile = (props) => {
   const [file, setfile] = useState();
+  const [email, setEmail] = useState();
+  const [imageUrl, setImageUrl] = useState();
   const userEmail = props?.auth?.currentUser?.email;
   const filePathRef = ref(props.storage, userEmail + "/profilePic");
   const [profilePicture, setProfilePicture] = useState(
     props?.auth?.currentUser?.photoURL
   );
 
-  function writeUserData(userId, name, email, imageUrl) {
+  function writeUserData(email, imageUrl) {
     const db = getDatabase();
-    set(ref(db, "users/" + userId), {
-      username: name,
+    set(ref(db, "users/"), {
       email: email,
       profile_picture: imageUrl,
     });
@@ -118,7 +119,10 @@ const EditProfile = (props) => {
               }}
               src={profilePicture}
             />
+            <br></br>
+            <br></br>
           </div>
+          <br></br>
           <input
             className="form-control form-control"
             type="file"

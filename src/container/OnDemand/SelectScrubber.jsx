@@ -7,14 +7,37 @@ import "../Dashboard/css/Navigation-Menu.css";
 import "../Dashboard/css/Pricing-Table---EspacioBinariocom.css";
 import "../Dashboard/css/styles.css";
 import "./styles.css";
-
+import { useAuth } from "../../helpers/context/useAuth.jsx";
 import img1 from "../About/assets/img/clean1.jpg";
 const SelectScrubber = () => {
   let history = useHistory();
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const scrubbitAuth = useAuth();
+  const showLoader = () => {
+    console.log("inside showLoader");
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          margin: "auto",
+          width: "50%",
+          padding: "10px",
+        }}
+      >
+        <div class="lds-ripple">
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    );
+  };
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 4000);
+  });
   return isLoading ? (
-    <Spinner />
+    showLoader()
   ) : (
     <div>
       <section className="pricing py-5" style={{ background: "white" }}>

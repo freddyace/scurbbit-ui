@@ -31,6 +31,8 @@ import { firebaseErrorConstants } from "./helpers/firebaseErrorConstants";
 import { auth } from "firebaseui";
 import { useAuth, ProvideAuth } from "./helpers/context/useAuth.jsx";
 import EmailVerification from "./container/Landing/CreateAccount/Verification/EmailVerification";
+import { getDatabase } from "firebase/database";
+
 function App() {
   const firebaseConfig = {
     apiKey: "AIzaSyCWL_temTPCHVn4wceJ5SAW-wIWoO2dVFc",
@@ -47,7 +49,7 @@ function App() {
   const storage = getStorage();
   // const picRef = ref(storage);
   const firebaseAuth = getAuth(app);
-
+  const scrubbitDatabase = getDatabase(app);
   const analytics = getAnalytics(app);
   const showLoader = () => {
     return (
@@ -111,19 +113,28 @@ function App() {
                 storage={storage}
                 firebaseAuth={firebaseAuth}
                 auth={auth}
+                database={scrubbitDatabase}
               />
             </Route>
             <PrivateRoute path="/editProfile">
               <AppNavBar storage={storage} auth={firebaseAuth} />
-              <EditProfile storage={storage} auth={firebaseAuth} />
+              <EditProfile
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
             </PrivateRoute>
             <PrivateRoute path="/dashboard">
-              <AppNavBar storage={storage} auth={firebaseAuth} />
+              <AppNavBar
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
               <Dashboard />
             </PrivateRoute>
             <PrivateRoute path="/contact">
               <AppNavBar storage={storage} auth={firebaseAuth} />
-              <Contact />
+              <Contact database={scrubbitDatabase} />
             </PrivateRoute>
             <Route path="/">
               <Landing />

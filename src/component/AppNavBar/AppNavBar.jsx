@@ -3,8 +3,10 @@ import { useHistory } from "react-router-dom";
 import defaultProfilePicFile from "../../container/Dashboard/img/img.png";
 import { Redirect } from "react-router-dom";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { useAuth } from "../../helpers/context/useAuth.jsx";
 
 const AppNavBar = (props) => {
+  const scrubbitAuth = useAuth();
   const [navBarStyles, setNavBarStyles] = useState("collapse navbar-collapse");
   const [showNavBar, setShowNavBar] = useState(false);
   let history = useHistory();
@@ -110,10 +112,7 @@ const AppNavBar = (props) => {
                 onClick={() => {
                   console.log("signing out...");
                   setIsLoading(true);
-                  setTimeout(() => {
-                    localStorage.removeItem("user");
-                    history.push("/");
-                  }, 3000);
+                  scrubbitAuth.signout();
                 }}
               >
                 Sign Out

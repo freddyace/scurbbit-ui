@@ -26,6 +26,7 @@ import Spinner from "../../../component/loader/Spinner.jsx";
 import { firebaseErrorConstants } from "../../../helpers/firebaseErrorConstants";
 import "./Terms.css";
 import { useAuth } from "../../../helpers/context/useAuth.jsx";
+import { getDatabase, ref, set } from "firebase/database";
 
 const CreateAccount = (props) => {
   const Landing = () => {
@@ -134,6 +135,13 @@ const CreateAccount = (props) => {
     const [phoneNumberError, setPhoneNumberError] = useState();
     const [showTerms, setShowTerms] = useState(false);
     const [checkboxChecked, setCheckboxChecked] = useState(false);
+    let scrubbitUser = {};
+    function writeUserData(user) {
+      const db = getDatabase();
+      set(ref(db, "users/" + user.email), {
+        email: user.email,
+      });
+    }
 
     const setAndSaveFormIndex = (index) => {
       console.log("saving the current index: ", index);
@@ -365,7 +373,18 @@ const CreateAccount = (props) => {
         setIsLoading(false);
         return;
       }
-      auth.signup(emailInput, passwordInput);
+      scrubbitUser.firstName = firstName;
+      scrubbitUser.lastName = lastName;
+      scrubbitUser.dateOfBirth = dateOfBirth;
+      scrubbitUser.phoneNumber = phoneNumber;
+      scrubbitUser.addressLine1 = addressLine1;
+      if (addressLine2 == undefined || addressLine2 == null) {
+        scrubbitUser.addressLine2 = "";
+      }
+      scrubbitUser.city = city;
+      scrubbitUser.state = homeState;
+      scrubbitUser.zip = zip;
+      auth.signup(emailInput, passwordInput, scrubbitUser);
       history.replace(from);
       history.push("/verification");
       setIsLoading(false);

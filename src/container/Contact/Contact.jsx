@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, onValue} from "firebase/database";
 import "./stylesheet.css";
+import { useAuth } from "../../helpers/context/useAuth.jsx";
+
 const Contact = (props) => {
+  const scrubbitAuth = useAuth();
   const [firstname, setFirstname] = useState(null);
   const [lastname, setLastname] = useState(null);
   const [county, setCounty] = useState(null);
@@ -14,13 +17,7 @@ const Contact = (props) => {
   const handleCountyChange = (event) => {
     setFirstname(event.target.value);
   };
-  const handleStateChange = (event) => {
-    console.log(event.target.value);
-  };
-  const handleFirstNameChange = (event) => {};
-  const handleLastNameChange = (event) => {
-    console.log(event.target.value);
-  };
+
   useEffect(() => {}, [firstname, lastname]);
   return (
     <div>
@@ -35,8 +32,8 @@ const Contact = (props) => {
           type="text"
           id="fname"
           name="firstname"
-          placeholder="First name.."
-          onChange={setFirstname}
+          value="Test"
+          disabled
         />
 
         <label for="lname">Last Name</label>

@@ -25,6 +25,7 @@ import {
 } from "react-router-dom";
 import { auth } from "firebaseui";
 import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCWL_temTPCHVn4wceJ5SAW-wIWoO2dVFc",
@@ -49,6 +50,33 @@ export function useAuth() {
   return useContext(authContext);
 }
 
+function writeUserData(
+  userId,
+  firstName,
+  lastName,
+  dateOfBirth,
+  phoneNumber,
+  addressLine1,
+  addressLine2,
+  city,
+  state,
+  zip,
+  email
+) {
+  const db = getDatabase();
+  set(ref(db, "users/" + userId), {
+    firstName: firstName,
+    lastName: lastName,
+    dateOfBirth: dateOfBirth,
+    phoneNumber: phoneNumber,
+    addressLine1: addressLine1,
+    addressLine2: addressLine2,
+    city: city,
+    state: state,
+    zip: zip,
+    email: email,
+  });
+}
 function useProvideAuth() {
   const [user, setUser] = useState(null);
   const [firebaseValidationError, setFirebaseValidationError] = useState();
@@ -59,7 +87,7 @@ function useProvideAuth() {
         if (!userCredential?.user?.emailVerified) {
           console.log("Email is not verified, exiting");
           setFirebaseValidationError(
-            "Please verify your email address before signing in."
+            "Please verify your email address before signing in. If you did not receive the verification link, reset your password."
           );
           signOut(firebaseAuth);
           return;
@@ -91,15 +119,31 @@ function useProvideAuth() {
   };
 
   const signout = () => {
-    signOut();
+    signOut(firebaseAuth);
+    localStorage.removeItem("user");
   };
-  const signup = (emailInput, passwordInput) => {
+
+  const signup = (emailInput, passwordInput, scrubbitUser) => {
     createUserWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
       .then((userCredential) => {
         // Signed in
-        //setUser(userCredential.user);
+        setUser(userCredential.user);
         // ...
+        writeUserData(
+          userCredential.user.uid,
+          scrubbitUser.firstName,
+          scrubbitUser.lastName,
+          scrubbitUser.dateOfBirth,
+          scrubbitUser.phoneNumber,
+          scrubbitUser.addressLine1,
+          scrubbitUser.addressLine2,
+          scrubbitUser.city,
+          scrubbitUser.state,
+          scrubbitUser.zip,
+          emailInput
+        );
         console.log("Successfully created user");
+        console.log("user credential is: ", userCredential);
         const actionCodeSettings = {
           url: "https://scrubbit-dev-336218.web.app",
           // iOS: {
@@ -113,7 +157,7 @@ function useProvideAuth() {
           handleCodeInApp: false,
         };
         console.log("url is: ", actionCodeSettings.url);
-        sendEmailVerification(userCredential.user, actionCodeSettings);
+        // sendEmailVerification(userCredential.user, actionCodeSettings);
         //applyActionCode();
         //localStorage.setItem("user", JSON.stringify(userCredential.user));
       })
@@ -122,6 +166,7 @@ function useProvideAuth() {
         const errorMessage = error.message;
         // ..
         setIsLoading(false);
+        console.log("error is:", error);
       });
   };
 

@@ -88,13 +88,9 @@ const Landing = () => {
   };
 
   useEffect(() => {
-    if (isLoading) {
-      setIsLoading(true);
-    }
-  }, [isLoading]);
-  useEffect(() => {});
+    console.log("user credential: ", scrubbitAuth);
+  });
   const handleSubmit = (e) => {
-    const firebaseAuth = getAuth();
     // setPersistence(firebaseAuth, firebase.auth.Auth.Persistence.NONE);
     clearErrors();
     setFirebaseValidationError();
