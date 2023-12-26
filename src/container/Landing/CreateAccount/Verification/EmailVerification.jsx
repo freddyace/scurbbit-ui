@@ -39,7 +39,7 @@ const EmailVerification = (props) => {
               }}
             >
               Thanks for signing up! A verfication email has been sent to:
-              [null]. Once verification is complete, you will be able to log in.
+              ${props.email}. Once verification is complete, you will be able to log in.
             </p>{" "}
             <br></br>
             <br></br>

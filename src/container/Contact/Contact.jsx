@@ -1,24 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { getDatabase, ref, set, onValue} from "firebase/database";
 import "./stylesheet.css";
 import { useAuth } from "../../helpers/context/useAuth.jsx";
+import { getDatabase, set, ref as dbRef, onValue } from "firebase/database";
 
 const Contact = (props) => {
+  const db = getDatabase();
   const scrubbitAuth = useAuth();
-  const [firstname, setFirstname] = useState(null);
-  const [lastname, setLastname] = useState(null);
+  const [userFirstname, setUserFirstName] = useState(null);
+  const [userLastname, setUserLastName] = useState(null);
   const [county, setCounty] = useState(null);
   const [state, setState] = useState(null);
   const database = getDatabase();
+  const [email, setEmail] = useState();
+
 
   const handleChange = (event) => {
     console.log(event.target.value);
   };
   const handleCountyChange = (event) => {
-    setFirstname(event.target.value);
+    console.log(event.target.value);
   };
 
-  useEffect(() => {}, [firstname, lastname]);
+  useEffect(() => {
+    const getUserData = () => {
+      console.log(props?.auth?.currentUser.uid)
+      const userId = props?.auth?.currentUser.uid;
+      return onValue(dbRef(db, 'users/' + userId), (snapshot) => {
+        console.log("snapshot: ", snapshot)
+        console.log("snapshot.val: ", snapshot.val())
+        const firstname = (snapshot.val() && snapshot.val().firstName) || 'N/A';
+        setUserFirstName(firstname);
+        const lastname = (snapshot.val() && snapshot.val().lastName) || 'N/A';
+        setUserLastName(lastname);
+        const email = (snapshot.val() && snapshot.val().email) || 'N/A';
+        setEmail(email);
+      }, {
+        onlyOnce: true
+      });
+    }
+  });
   return (
     <div>
       <div className="contact">
@@ -27,49 +47,25 @@ const Contact = (props) => {
           for any reason, please fill out the form below and a team member will
           reach out to you as soon as possible.
         </p>
-        <label for="fname">First Name</label>
-        <input
-          type="text"
-          id="fname"
-          name="firstname"
-          value="Test"
-          disabled
-        />
-
-        <label for="lname">Last Name</label>
-        <input
-          type="text"
-          id="lname"
-          name="lastname"
-          placeholder="Last name.."
-          fd
-          c
-        />
-
-        <label for="state">State</label>
-        <select id="State" name="state">
-          <option value="Georgia">Georgia</option>
-          <option value="canada">Florida</option>
-          <option value="usa">Tenessee</option>
-        </select>
-        <label for="county">County</label>
-        <select id="County" name="country" onChange={handleChange}>
-          <option value="Fulton">Fulton</option>
-          <option value="Clayton">Clayton</option>
-          <option value="Henry">Henry</option>
-        </select>
         <label for="message">Message</label>
-        <textarea id="message">Some text...</textarea>
+        <textarea id="message"></textarea>
 
         <button
+        
           onClick={() => {
-            const obj = { name: "John", age: 21 };
+            const obj = {
+              firstname: "Sarah", lastname: "Campbell",
+              email: "scampbell002@emai.com", 
+              message: "I placed and order and the scrubber never showed up. I need a refund, threre is no way to do this in the app." ,
+              state: "GA",
+              county: "Henry"
+            };
             // const obj2 = {firstname: }
             console.log(JSON.stringify(obj));
             const db = getDatabase();
-            set(ref(db, "users"), obj);
+            set(dbRef(db, "customer_inquiry"), obj);
           }}
-        />
+        >Submit</button>
       </div>
     </div>
   );

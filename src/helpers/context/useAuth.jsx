@@ -84,7 +84,7 @@ function useProvideAuth() {
   const signin = (callback, emailInput, passwordInput) => {
     signInWithEmailAndPassword(firebaseAuth, emailInput, passwordInput)
       .then((userCredential) => {
-        if (!userCredential?.user?.emailVerified) {
+        if (userCredential?.user?.emailVerified) {
           console.log("Email is not verified, exiting");
           setFirebaseValidationError(
             "Please verify your email address before signing in. If you did not receive the verification link, reset your password."
@@ -106,7 +106,7 @@ function useProvideAuth() {
         const errorMessage = error.message;
         if (errorCode === "auth/wrong-password") {
           setFirebaseValidationError("Invalid email or password");
-        } else {
+        } else { 
           setFirebaseValidationError(
             "An error occured during authentication..."
           );

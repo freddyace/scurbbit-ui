@@ -8,12 +8,18 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useState, useEffect } from "react";
 import { validateEditAccount } from "../../helpers/validation/useForm";
 import { updateProfile } from "firebase/auth";
-import { getDatabase, set } from "firebase/database";
+import { getDatabase, set, ref as dbRef, onValue } from "firebase/database";
+import { useAuth } from "../../helpers/context/useAuth";
+import BasicAccordion from "./CreditCardAccordion/CreditCard";
 
 const EditProfile = (props) => {
+  const db = getDatabase();
+  const auth = useAuth();
   const [file, setfile] = useState();
   const [email, setEmail] = useState();
   const [imageUrl, setImageUrl] = useState();
+  const [userFirstname, setUserFirstName] = useState();
+  const [userLastname, setUserLastName] = useState();
   const userEmail = props?.auth?.currentUser?.email;
   const filePathRef = ref(props.storage, userEmail + "/profilePic");
   const [profilePicture, setProfilePicture] = useState(
@@ -21,15 +27,37 @@ const EditProfile = (props) => {
   );
 
   function writeUserData(email, imageUrl) {
-    const db = getDatabase();
     set(ref(db, "users/"), {
       email: email,
       profile_picture: imageUrl,
     });
   }
   useEffect(() => {
-    console.log("Attempting to fetch profile pic...");
+    getUserData();
   });
+
+  const getUserData = () => {
+    console.log(props?.auth?.currentUser.uid);
+    const userId = props?.auth?.currentUser.uid;
+    console.log("props.auth: ", props.auth);
+    return onValue(
+      dbRef(db, "users/" + userId),
+      (snapshot) => {
+        console.log("snapshot: ", snapshot);
+        console.log("snapshot.val: ", snapshot.val());
+        const firstname = (snapshot.val() && snapshot.val().firstName) || "N/A";
+        setUserFirstName(firstname);
+        const lastname = (snapshot.val() && snapshot.val().lastName) || "N/A";
+        setUserLastName(lastname);
+        const email = (snapshot.val() && snapshot.val().email) || "N/A";
+        setEmail(email);
+      },
+      {
+        onlyOnce: true,
+      }
+    );
+  };
+
   const downloadFirebaseImg = () => {
     getDownloadURL(ref(props.storage, filePathRef))
       .then((url) => {
@@ -119,19 +147,20 @@ const EditProfile = (props) => {
               }}
               src={profilePicture}
             />
-            <br></br>
-            <br></br>
           </div>
-          <br></br>
-          <input
-            className="form-control form-control"
-            type="file"
-            name="file"
-            onChange={changeHandler}
-          />
-          <div className="col-md-8">
+          <div className="col-md-8 center">
             <h1>Profile </h1>
             <hr />
+            <label className="form-label">Upload profile picture: </label>
+            <input
+              className="form-control form-control"
+              type="file"
+              name="file"
+              onChange={changeHandler}
+            />
+            <br></br>
+            <hr />
+            <br></br>
             <div className="row">
               <div className="col-sm-12 col-md-6">
                 <div className="form-group mb-3">
@@ -141,6 +170,7 @@ const EditProfile = (props) => {
                     type="text"
                     name="firstname"
                     disabled
+                    value={userFirstname}
                   />
                 </div>
               </div>
@@ -152,47 +182,27 @@ const EditProfile = (props) => {
                     type="text"
                     name="lastname"
                     disabled
+                    value={userLastname}
                   />
                 </div>
               </div>
             </div>
             <div className="form-group mb-3">
-              <label className="form-label">Email </label>
+              <label className="form-label">Email Address</label>
               <input
                 className="form-control"
                 type="email"
                 autoComplete="off"
                 required=""
                 name="email"
+                disabled
+                value={email}
               />
             </div>
-            <div className="row">
-              <div className="col-sm-12 col-md-6">
-                <div className="form-group mb-3">
-                  <label className="form-label">Password </label>
-                  <input
-                    className="form-control"
-                    type="password"
-                    name="password"
-                    autoComplete="off"
-                    required=""
-                  />
-                </div>
-              </div>
-              <div className="col-sm-12 col-md-6">
-                <div className="form-group mb-3">
-                  <label className="form-label">Confirm Password</label>
-                  <input
-                    className="form-control"
-                    type="password"
-                    name="confirmpass"
-                    autoComplete="off"
-                    required=""
-                  />
-                </div>
-              </div>
-            </div>
             <hr />
+            <label className="form-label">Payment Methods </label>
+            <BasicAccordion />
+            <br></br>
             <div className="row">
               <div className="col-md-12 content-right">
                 <button className="btn btn-primary form-btn" onClick={onSubmit}>
