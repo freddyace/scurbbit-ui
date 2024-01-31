@@ -21,17 +21,21 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import EditProfile from "../src/container/EditProfile/EditProfile.jsx";
-import SelectScrubber from "./container/OnDemand/SelectScrubber.jsx";
+import SelectService from "./container/OnDemand/SelectService.jsx";
 import AppNavBar from "./component/AppNavBar/AppNavBar";
 import About from "./container/About";
 import Contact from "./container/Contact/Contact";
 import Landing from "./container/Landing/Landing";
+import CreateFullServiceOrder from "./container/OnDemand/CreateFullServiceOrder.jsx";
+import CreateInteriorServiceOrder from "./container/OnDemand/CreateInteriorServiceOrder.jsx";
+import CreateExteriorServiceOrder from "./container/OnDemand/CreateExteriorServiceOrder.jsx";
 import { useForm } from "./helpers/validation/useForm";
 import { firebaseErrorConstants } from "./helpers/firebaseErrorConstants";
 import { auth } from "firebaseui";
 import { useAuth, ProvideAuth } from "./helpers/context/useAuth.jsx";
 import EmailVerification from "./container/Landing/CreateAccount/Verification/EmailVerification";
 import { getDatabase } from "firebase/database";
+import MessageSent from "./container/Contact/MessageSent.jsx";
 
 function App() {
   const firebaseConfig = {
@@ -98,8 +102,8 @@ function App() {
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
-            <PrivateRoute path="/getService">
-              <SelectScrubber />
+            <PrivateRoute path="/selectService">
+              <SelectService />
             </PrivateRoute>
             <Route path="/about">
               <AppNavBar storage={storage} auth={firebaseAuth} />
@@ -116,6 +120,38 @@ function App() {
                 database={scrubbitDatabase}
               />
             </Route>
+            <PrivateRoute path="/messageSent">
+              <AppNavBar storage={storage} auth={firebaseAuth} />
+              <MessageSent
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
+            </PrivateRoute>
+            <PrivateRoute path="/createFullServiceOrder">
+              {/* <AppNavBar storage={storage} auth={firebaseAuth} /> */}
+              <CreateFullServiceOrder
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
+            </PrivateRoute>
+            <PrivateRoute path="/createExteriorServiceOrder">
+              {/* <AppNavBar storage={storage} auth={firebaseAuth} /> */}
+              <CreateExteriorServiceOrder
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
+            </PrivateRoute>
+            <PrivateRoute path="/createInteriorServiceOrder">
+              {/* <AppNavBar storage={storage} auth={firebaseAuth} /> */}
+              <CreateInteriorServiceOrder
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
+            </PrivateRoute>
             <PrivateRoute path="/editProfile">
               <AppNavBar storage={storage} auth={firebaseAuth} />
               <EditProfile
@@ -134,7 +170,11 @@ function App() {
             </PrivateRoute>
             <PrivateRoute path="/contact">
               <AppNavBar storage={storage} auth={firebaseAuth} />
-              <Contact database={scrubbitDatabase} />
+              <Contact
+                storage={storage}
+                auth={firebaseAuth}
+                database={scrubbitDatabase}
+              />
             </PrivateRoute>
             <Route path="/">
               <Landing />

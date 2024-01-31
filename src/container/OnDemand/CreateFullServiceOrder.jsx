@@ -9,7 +9,7 @@ import "../Dashboard/css/styles.css";
 import "./styles.css";
 import { useAuth } from "../../helpers/context/useAuth.jsx";
 import img1 from "../About/assets/img/clean1.jpg";
-const SelectScrubber = () => {
+const CreateFullServiceOrder = () => {
   let history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const scrubbitAuth = useAuth();
@@ -73,7 +73,7 @@ const SelectScrubber = () => {
                       border: "white",
                     }}
                     onClick={() => {
-                      history.push("/getService");
+                      history.push("/selectService");
                     }}
                   >
                     Start Order
@@ -102,4 +102,4 @@ const SelectScrubber = () => {
   );
 };
 
-export default SelectScrubber;
+export default CreateFullServiceOrder;

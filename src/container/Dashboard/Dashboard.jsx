@@ -49,7 +49,7 @@ const Dashboard = () => {
                       border: "white",
                     }}
                     onClick={() => {
-                      history.push("/getService");
+                      history.push("/selectService");
                     }}
                   >
                     Order service now
